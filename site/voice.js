@@ -1,7 +1,7 @@
 /* 음성: eSpeak NG로 말을 합성한 뒤 문장부호와 목소리 설정에 맞게 변조한다 */
 let engine=null;
 const SR=22050;
-const VOICE_DEFAULT={id:'helium',name:'헬륨 쪼꼬미',pitch:70,rate:122,range:70,speed:1.22,wobble:0,robot:0};
+const VOICE_DEFAULT={id:'helium',name:'헬륨 쪼꼬미',pitch:78,rate:124,range:80,speed:1.26,wobble:0,robot:0};
 const VOICE_PRESETS=[VOICE_DEFAULT,
  {id:'anchor',name:'뉴스 앵커',pitch:52,rate:150,range:28,speed:1.02,wobble:0,robot:0},
  {id:'greasy',name:'느끼한 아저씨',pitch:28,rate:150,range:80,speed:.9,wobble:.22,robot:0},
@@ -69,6 +69,7 @@ function buildSpeech(raw,v,opt={}){
   {let best=null;for(const[word,name]of Object.entries(SPECIALS)){const re=word==='바이'||word==='빠이'?new RegExp('(^|[\\s,.!?~])'+word+'($|[\\s,.!?~])'):null,hit=re?re.exec(seg.raw):null,i=re?(hit?hit.index:-1):seg.raw.indexOf(word);if(i>=0&&(!best||i<best.i))best={i,word,name}}if(best)specials.push({ms:t,word:best.word,name:best.name})}
   parts.push(finalOut);t+=finalOut.length/SR*1000;const gap=seg.dots?.28:.09;parts.push(new Float32Array(Math.round(gap*SR)));t+=gap*1000}
  const n=parts.reduce((a,p)=>a+p.length,0),pcm=new Float32Array(n);let o=0;for(const p of parts){pcm.set(p,o);o+=p.length}
+ {let prev=0,pk=0;for(let i=0;i<n;i++){const x=pcm[i];pcm[i]=x-.62*prev;prev=x;pk=Math.max(pk,Math.abs(pcm[i]))}const k=.92/(pk||1);for(let i=0;i<n;i++)pcm[i]*=k}// 자음이 또렷하게 들리도록 고음을 살린다
  events.sort((a,b)=>a.ms-b.ms);let mix=pcm;
  if(specials.length&&!opt.plain){const sp=specials[0];specials.length=1;const beat=Beat.get(SR,16,BGM_OF[sp.name]||'dumchit'),st=Math.round(sp.ms/1000*SR),L=Math.round(16*60/Beat.BPM*SR),len=Math.max(n,st+L+SR/4|0);mix=new Float32Array(len);mix.set(pcm);for(let i=0;i<L;i++){const e=Math.min(1,(L-i)/(SR*.15));mix[st+i]+=beat[i]*.85*e}}
  const m=mix.length;for(let i=0;i<m;i++)mix[i]=Math.tanh(mix[i]*1.05)*.95; // 귀를 보호하는 상한

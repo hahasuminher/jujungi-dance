@@ -23,6 +23,8 @@
       <button id="go" type="submit" disabled>목 푸는 중</button>
     </div>
     <button id="enter" type="button">광장 입장</button>
+    <button id="friend" type="button">친구 광장</button>
+    <div id="friendBox" hidden><button id="fMake" type="button">새 친구 광장 만들기</button><div class="row"><input id="fCode" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="입장 코드 5자리" aria-label="입장 코드"><button id="fJoin" type="button">입장</button></div></div>
     <div class="row sub-row">
       <button id="record" type="button">영상 저장</button>
       <button id="share" type="button">사이트 공유</button>
@@ -40,7 +42,7 @@
 </div>
 <div id="plazaUi">
   <div id="plazaTop"><strong id="roomInfo"></strong><span class="top-r"><button id="zOut" type="button" aria-label="축소">-</button><button id="zIn" type="button" aria-label="확대">+</button><button id="setBtn" type="button">설정</button></span></div>
-  <div id="setMenu" hidden><button id="beep" type="button" aria-pressed="true">욕 삐 처리 켬</button><button id="allHear" type="button" aria-pressed="false">전체 듣기 끔</button><label for="volume">볼륨<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label><small id="pLag"></small><strong>목소리</strong><div id="pVoices" class="chips"></div><button id="leave" type="button">광장 나가기</button></div>
+  <div id="setMenu" hidden><button id="beep" type="button" aria-pressed="true">욕 삐 처리 켬</button><button id="allHear" type="button" aria-pressed="false">전체 듣기 끔</button><label for="volume">볼륨<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label><button id="pCode" type="button" hidden></button><small id="pLag"></small><strong>목소리</strong><div id="pVoices" class="chips"></div><button id="leave" type="button">광장 나가기</button></div>
   <div id="peerMenu" hidden><strong id="peerName"></strong><button id="peerMute" type="button">음소거</button><button id="peerReport" type="button">신고</button></div>
   <div id="pMsg" role="status"></div>
   <div id="clubOpen" class="pop" hidden><strong>주둥이 클럽 열기</strong><label for="clubIn">클럽에서 반복할 말</label><input id="clubIn" maxlength="30" placeholder="30자까지, 비속어 금지" autocomplete="off"><div id="clubThemes" class="chips"><button class="chip" type="button" data-t="edm" aria-pressed="true">EDM</button><button class="chip" type="button" data-t="hiphop" aria-pressed="false">힙합</button><button class="chip" type="button" data-t="disco" aria-pressed="false">디스코</button><button class="chip" type="button" data-t="trot" aria-pressed="false">트로트</button></div><div class="pop-row"><button id="clubGo" type="button">초대 보내기</button><button id="clubCancel" type="button">닫기</button></div></div>
