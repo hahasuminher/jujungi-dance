@@ -37,7 +37,7 @@ $('voiceSave').onclick=()=>{const list=store.get('jd.custom',[]),id='c'+Date.now
 /* 공유 */
 const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const dec=s=>JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/')))));
-let volume=1,extPlaying=false,clubLoop=false,clubTheme='edm';const CLUB_DANCE={edm:['cEdm1','cEdm2','combo','sixstep','jackpot'],hiphop:['cHip1','cHip2','cHip3'],disco:['cDis1','cDis2'],trot:['cTro1','cTro2']};
+let volume=1,extPlaying=false,clubLoop=false,clubTheme='edm';const CLUB_DANCE={edm:['cEdm1','cEdm2','sA','sD','combo'],hiphop:['cHip1','cHip2','cHip3','sB','sD'],disco:['cDis1','cDis2','sB','sA'],trot:['cTro1','cTro2','sE','sC']};
 const SILENT=URL.createObjectURL(wav(new Float32Array(2205),SR));function unlockAudio(){Sfx.unlock();player.src=SILENT;player.play().catch(()=>{})}
 const NOVOL=(()=>{const a=new Audio();a.volume=.5;return a.volume!==.5})(),bake=(pcm,k)=>{if(NOVOL&&k!=null&&k<1)for(let i=0;i<pcm.length;i++)pcm[i]*=k;return pcm};
 let sw=null,swOk=false,swId=0;const swWait=new Map();

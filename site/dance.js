@@ -163,13 +163,13 @@ function draw(g,ox,oy,S,tick,raster){const sd=tick*2.1;const lw=2.6/S*Math.min(1
  g.save();g.translate(ox+R.dx*H_U*S,oy+R.dy*H_U*S);g.rotate(R.rot);g.scale(S,S);g.translate(-CXs,-CYs);g.lineJoin=g.lineCap='round';
  const useR=raster&&settled&&T.cel&&IMG[T.cel];
  if(useR){g.save();if(T.mir){g.translate(CXs*2,0);g.scale(-1,1)}const rot=T.rot;if(rot){g.translate(CXs,CYs);g.rotate(-rot);g.translate(-CXs,-CYs)}g.drawImage(IMG[T.cel],0,0,2362,2362);g.restore()}
- else{g.beginPath();for(let i=0;i<M;i++){const x=X[i*2]+wob(i,sd)*2,y=X[i*2+1]+wob(i,sd+9)*2;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fillStyle='#fff';g.fill();g.strokeStyle='#0d0d0d';g.lineWidth=lw;g.stroke()}
+ else{g.beginPath();for(let i=0;i<M;i++){const x=X[i*2]+wob(i,sd)*.55,y=X[i*2+1]+wob(i,sd+9)*.55;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fillStyle='#fff';g.fill();g.strokeStyle='#0d0d0d';g.lineWidth=lw;g.stroke()}
  const nb=[X[0],X[1]],ca=Math.cos(H.ang),sa=Math.sin(H.ang),hw=HH*H.s,hp=(u,v)=>[H.x+u*hw*ca-v*hw*sa,H.y+u*hw*sa+v*hw*ca],hA=hp(-.15,.38),hB=hp(.15,.38);
  if(Math.hypot((hA[0]+hB[0])/2-nb[0],(hA[1]+hB[1])/2-nb[1])>NECK_REST+55){const L=[X[(M-16)*2],X[(M-16)*2+1]],Rr=[X[32],X[33]];g.beginPath();g.moveTo(L[0],L[1]);g.lineTo(hA[0],hA[1]);g.lineTo(hB[0],hB[1]);g.lineTo(Rr[0],Rr[1]);g.closePath();g.fillStyle='#fff';g.fill();g.beginPath();g.moveTo(L[0],L[1]);g.lineTo(hA[0],hA[1]);g.moveTo(Rr[0],Rr[1]);g.lineTo(hB[0],hB[1]);g.strokeStyle='#0d0d0d';g.lineWidth=lw;g.stroke()}
  const k=hkU<.5?hkA:hkB,fl=hkU<.5?hfA:hfB,side=k===1;
  g.save();g.translate(H.x,H.y);g.rotate(H.ang);g.scale(HH*H.s,HH*H.s);
- if(!useR||mouth>.05||mouthExtra>.05){const poly=headPoly();g.beginPath();poly.forEach((q,i)=>{const x=q[0]+wob(i,sd+3)*.0016,y=q[1]+wob(i,sd+5)*.0016;i?g.lineTo(x,y):g.moveTo(x,y)});g.closePath();g.fillStyle='#fff';g.fill();g.strokeStyle='#0d0d0d';g.lineWidth=lw/(HH*H.s);g.stroke();
-  if(k!==2){g.save();g.clip();const src=side?HEADS.side:HEADS.front,cen=side?headSide:headFront,sh=hkA===hkB?0:(hkU<.5?hkU*2:(1-hkU)*2)*.1*(fl?1:-1);g.scale(fl&&side?-1:1,1);g.fillStyle='#0d0d0d';const m=clamp(mouth+mouthExtra,0,6);src.feats.forEach((f,fi)=>{const low=!side&&fi===lowerFeat,dy=low?m*.05:0;g.beginPath();f.forEach((q,i)=>{const x=q[0]-cen.cx+sh,y=q[1]-cen.cy+dy;i?g.lineTo(x,y):g.moveTo(x,y)});g.closePath();g.fill()});
+ if(!useR||mouth>.05||mouthExtra>.05){const poly=headPoly();g.beginPath();poly.forEach((q,i)=>{const x=q[0]+wob(i,sd+3)*.0011,y=q[1]+wob(i,sd+5)*.0011;i?g.lineTo(x,y):g.moveTo(x,y)});g.closePath();g.fillStyle='#fff';g.fill();g.strokeStyle='#0d0d0d';g.lineWidth=lw/(HH*H.s);g.stroke();
+  if(k!==2){g.save();g.clip();const src=side?HEADS.side:HEADS.front,cen=side?headSide:headFront,sh=hkA===hkB?0:(hkU<.5?hkU*2:(1-hkU)*2)*.1*(fl?1:-1);g.scale(fl&&side?-1:1,1);g.fillStyle='#0d0d0d';const m=clamp(mouth+mouthExtra,0,6);src.feats.forEach((f,fi)=>{const low=!side&&fi===lowerFeat,dy=low?m*.05:0;g.beginPath();f.forEach((q,i)=>{const x=q[0]-cen.cx+sh+wob(i*6,sd+fi*2+11)*.0011,y=q[1]-cen.cy+dy+wob(i*6,sd+fi*2+13)*.0011;i?g.lineTo(x,y):g.moveTo(x,y)});g.closePath();g.fill()});
    if(!side&&m>.1){const up=HEADS.front.feats[lowerFeat],uy=up.reduce((s2,p)=>s2+p[1],0)/up.length-headFront.cy;g.beginPath();g.ellipse(sh,uy-.02+m*.025,.055+m*.012,m*.03,0,0,7);g.fill()}g.restore()}}
  g.restore();g.restore()}
 /* 평소 춤: 뼈대 자세를 윤곽 목표로 삼아 탄력 있게 따라간다. 전신 동작을 덮어 쓴다 */
@@ -202,6 +202,13 @@ const FINALE={run:'sixstep',melt:'headspin',love:'lotto',chicken:'windmill',lott
  cTro2:()=>{const o=[];for(let i=0;i<4;i++)o.push([i,shd(i)],[i+.5,shd(i,{ry:.05,kl:.9,kr:.9})]);return[...o,[4,rp({al:2.5,ar:.9,bl:.2,br:2.5,kl:1.9,kr:1.9,ry:.13,hr:.3})],[5,rp({ar:2.5,al:.9,br:.2,bl:2.5,kl:.3,kr:.3,hr:-.3})],[6,rp({al:2.5,ar:.9,bl:.2,br:2.5,kl:1.9,kr:1.9,ry:.13,tw:.4})],[7,PZ.G],[8,shd(0)]]},
  cEdm1:()=>{const o=[];for(let i=0;i<8;i++)o.push([i,i%4<2?pump(i):mirror(pump(i)),{dy:-.16}],[i+.5,rp({kl:.9,kr:.9,ry:.05,al:.9,ar:.9,bl:2.4,br:2.4}),{dy:0}]);return o},
  cEdm2:()=>{const o=[];for(let i=0;i<12;i++)o.push([i*.5,run(i),{dx:Math.sin(i*.39)*.2}]);return[...o,[6,PZ.I,{dx:0}],[7,mirror(PZ.I)]]}});
+ const m=mirror,Z=PZ;Object.assign(BIG,{
+ sA:()=>[[0,Z.G],[1,Z.M],[2,Z.K],[3,Z.L],[4,Z.Q],[5,Z.G,{dy:-.14}],[6,Z.S,{dy:0}],[7,m(Z.S)],[7.7,A]],
+ sB:()=>[[0,Z.H],[.5,m(Z.H)],[1,Z.H],[1.5,m(Z.H)],[2,Z.I],[3,m(Z.I)],[4,Z.J],[5,m(Z.J)],[6,Z.R],[7,m(Z.R)],[7.7,A]],
+ sC:()=>[[0,Z.O],[2,m(Z.O)],[4,Z.K],[5,Z.M],[6,Z.G,{dy:-.2}],[7,Z.M,{dy:0}],[7.7,A]],
+ sD:()=>[[0,Z.S],[1,Z.H],[2,Z.I],[3,Z.J],[4,m(Z.S)],[5,m(Z.H)],[6,m(Z.I)],[7,m(Z.J)],[7.7,A]],
+ sE:()=>[[0,Z.Q],[1,Z.L],[2,Z.M,{dy:-.15}],[3,Z.L,{dy:0}],[4,Z.K],[5,Z.Q],[6,Z.G,{dy:-.18}],[7,Z.M,{dy:0}],[7.7,A]]});
+ {const R5=['sA','sB','sC','sD','sE'];Object.keys(BIG).filter(k=>!/^(c[A-Z]|s[A-E]$)/.test(k)).forEach((k,i)=>{FINALE[k]=R5[i%5]});Object.assign(FINALE,{sA:'sB',sB:'sD',sC:'sE',sD:'sA',sE:'sC'})}
  Object.assign(FINALE,{cHip1:'cHip2',cHip2:'cHip3',cHip3:'cHip1',cDis1:'cDis2',cDis2:'cDis1',cTro1:'cTro2',cTro2:'cTro1',cEdm1:'cEdm2',cEdm2:'cEdm1'})}
 return{setLow(v){lowP=v},setImages(i){Object.assign(IMG,i)},reseed,
  update(dt,now){clock+=dt;if(bigSeq){bigT+=dt/BEAT*beatRate;while(bigI<bigSeq.length&&bigSeq[bigI][0]<=bigT){const[,p,o]=bigSeq[bigI];setTarget(p,o||{dx:T.dx,dy:T.dy});bigI++}if(bigT>=16.1){bigSeq=null;cloneOn=0;orbit=0;endBig()}}else liveTarget(dt,now);stepBody(dt);let e=0;for(let i=0;i<M*2;i+=11)e+=Math.abs(X[i]-T.body[i]);settled=e/(M*2/11)<2.4&&Math.abs(H.x-T.head.x)<3&&hkU>=1&&Math.abs(wrap(R.rot-T.rot))<.02},

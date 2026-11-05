@@ -18,16 +18,15 @@
     <div id="sub"></div>
   </div>
   <form id="f">
-    <label class="say" for="say">아무 말이나 쳐봐. 느낌표!!!를 많이 붙일수록 난리 난다.</label>
-    <textarea id="say" maxlength="300">이 곳에 하고 싶은 말을 입력해 보세요~~</textarea>
+    <textarea id="say" maxlength="300" aria-label="하고 싶은 말">이 곳에 하고 싶은 말을 입력해 보세요~~</textarea>
     <div class="row">
       <button id="go" type="submit" disabled>목 푸는 중</button>
     </div>
+    <button id="enter" type="button">광장 입장</button>
     <div class="row sub-row">
       <button id="record" type="button">영상 저장</button>
       <button id="share" type="button">사이트 공유</button>
     </div>
-    <button id="enter" type="button">광장 입장</button>
     <div id="msg" role="status"></div>
   </form>
   <details id="rules"><summary>광장 규칙</summary>
