@@ -79,9 +79,10 @@ const Plaza=(()=>{let ws=null,on=false,me=0,room=0,WORLD=1400,MIC={x:700,y:700,r
   const up=e=>{touches.delete(e.pointerId);if(touches.size<2)pinch=0;if(!on||!drag)return;drag=false;const[x,y,W,H]=pos(e),w=toW(x,y,W,H),q=peers.get(me);if(moved<10){const t=hit(w[0],w[1]);if(t){q.tx=q.x;q.ty=q.y;openMenu(t,x,y);return}}if(q){lastSend=0;walkTo(q.tx,q.ty)}};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up)}
  const wob=(i,t)=>Math.sin(i*1.7+t*2.1)*2;
  function line(g,pts,t,w=3,c='#0d0d0d'){g.beginPath();pts.forEach((p,i)=>{const x=p[0]+wob(i,t),y=p[1]+wob(i+5,t);i?g.lineTo(x,y):g.moveTo(x,y)});g.strokeStyle=c;g.lineWidth=w;g.lineCap=g.lineJoin='round';g.stroke()}
+ function gridLine(g,P,t){g.beginPath();let n=0;for(let k=0;k<P.length-1;k++){const[a,b]=P[k],[c,d]=P[k+1],L=Math.hypot(c-a,d-b),m=Math.max(1,Math.round(L/24)),ux=(c-a)/L,uy=(d-b)/L;for(let j=0;j<m;j++){const e=j/m,o=1.5*Math.sin(n*.83+t*2.1)+1*Math.sin(n*.31-t*1.3),x=a+(c-a)*e-uy*o,y=b+(d-b)*e+ux*o;n++?g.lineTo(x,y):g.moveTo(x,y)}}g.strokeStyle='#e0e0d2';g.lineWidth=2;g.lineCap=g.lineJoin='round';g.stroke()}
  function makeBg(){bgC=[0,1,2].map(f=>{const c=document.createElement('canvas');c.width=c.height=WORLD;const g=c.getContext('2d'),t=f*3+1;
   for(const[x,y,r]of[[350,380,120],[1050,300,90],[1100,1000,140],[650,800,70]])Rough.poly(g,Rough.ell(x,y,r,r*.55,18),{fill:'#f4ff1f',stroke:null,amp:3,seed:x});
-  for(let i=0;i<=14;i++){line(g,[[0,i*100],[350,i*100+9],[700,i*100-7],[1050,i*100+6],[WORLD,i*100]],t+i,2,'#e6e6dc');line(g,[[i*100,0],[i*100+8,350],[i*100-7,700],[i*100+6,1050],[i*100,WORLD]],t+i+9,2,'#e6e6dc')}
+  for(let i=0;i<=14;i++){gridLine(g,[[0,i*100],[350,i*100+9],[700,i*100-7],[1050,i*100+6],[WORLD,i*100]],t+i);gridLine(g,[[i*100,0],[i*100+8,350],[i*100-7,700],[i*100+6,1050],[i*100,WORLD]],t+i+9)}
   line(g,[[6,6],[700,0],[WORLD-6,6],[WORLD,700],[WORLD-6,WORLD-6],[700,WORLD],[6,WORLD-6],[0,700],[6,6]],t,5);
   micZone(g);return c})}
  function ground(g,W,Ht,t){g.fillStyle='#fff';g.fillRect(0,0,W,Ht);g.save();g.translate(W/2-cam.x,Ht/2-cam.y);
