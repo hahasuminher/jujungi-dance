@@ -159,7 +159,7 @@ function draw(g,ox,oy,S,tick,raster){const sd=tick*2.1;const lw=2.6/S*Math.min(1
  if(useR){g.save();if(T.mir){g.translate(CXs*2,0);g.scale(-1,1)}const rot=T.rot;if(rot){g.translate(CXs,CYs);g.rotate(-rot);g.translate(-CXs,-CYs)}g.drawImage(IMG[T.cel],0,0,2362,2362);g.restore()}
  else{g.beginPath();for(let i=0;i<M;i++){const x=X[i*2]+wob(i,sd)*2,y=X[i*2+1]+wob(i,sd+9)*2;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fillStyle='#fff';g.fill();g.strokeStyle='#0d0d0d';g.lineWidth=lw;g.stroke()}
  const nb=[X[0],X[1]],ca=Math.cos(H.ang),sa=Math.sin(H.ang),hw=HH*H.s,hp=(u,v)=>[H.x+u*hw*ca-v*hw*sa,H.y+u*hw*sa+v*hw*ca],hA=hp(-.15,.38),hB=hp(.15,.38);
- if(Math.hypot((hA[0]+hB[0])/2-nb[0],(hA[1]+hB[1])/2-nb[1])>34){const L=[X[(M-16)*2],X[(M-16)*2+1]],Rr=[X[32],X[33]];g.beginPath();g.moveTo(L[0],L[1]);g.lineTo(hA[0],hA[1]);g.lineTo(hB[0],hB[1]);g.lineTo(Rr[0],Rr[1]);g.closePath();g.fillStyle='#fff';g.fill();g.beginPath();g.moveTo(L[0],L[1]);g.lineTo(hA[0],hA[1]);g.moveTo(Rr[0],Rr[1]);g.lineTo(hB[0],hB[1]);g.strokeStyle='#0d0d0d';g.lineWidth=lw;g.stroke()}
+ if(Math.hypot((hA[0]+hB[0])/2-nb[0],(hA[1]+hB[1])/2-nb[1])>NECK_REST+55){const L=[X[(M-16)*2],X[(M-16)*2+1]],Rr=[X[32],X[33]];g.beginPath();g.moveTo(L[0],L[1]);g.lineTo(hA[0],hA[1]);g.lineTo(hB[0],hB[1]);g.lineTo(Rr[0],Rr[1]);g.closePath();g.fillStyle='#fff';g.fill();g.beginPath();g.moveTo(L[0],L[1]);g.lineTo(hA[0],hA[1]);g.moveTo(Rr[0],Rr[1]);g.lineTo(hB[0],hB[1]);g.strokeStyle='#0d0d0d';g.lineWidth=lw;g.stroke()}
  const k=hkU<.5?hkA:hkB,fl=hkU<.5?hfA:hfB,side=k===1;
  g.save();g.translate(H.x,H.y);g.rotate(H.ang);g.scale(HH*H.s,HH*H.s);
  if(!useR||mouth>.05||mouthExtra>.05){const poly=headPoly();g.beginPath();poly.forEach((q,i)=>{const x=q[0]+wob(i,sd+3)*.0016,y=q[1]+wob(i,sd+5)*.0016;i?g.lineTo(x,y):g.moveTo(x,y)});g.closePath();g.fillStyle='#fff';g.fill();g.strokeStyle='#0d0d0d';g.lineWidth=lw/(HH*H.s);g.stroke();
@@ -170,7 +170,7 @@ function draw(g,ox,oy,S,tick,raster){const sd=tick*2.1;const lw=2.6/S*Math.min(1
 let curC=null,curV=null,curW=null,tC=0,tV=0,tW=0,wCool=0,fxv={ex:0,q:0,til:0,dots:false},ghostOn=0,trail=[];
 let clock=0,lastSpin=-99,lastKind='s';const recent=[],shuffle2=x=>{x=[...x];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x};
 const ARM=['al','ar','bl','br','sl','sr'],SOFT=['hr','hx','hy','hs'];
-const IDLE={...A,cel:null};
+const IDLE={...A,cel:null};const NECK_REST=Math.hypot(A.head.x-A.body[0],A.head.y+.38*HH-A.body[1]);
 function liveTarget(dt,now){tC+=dt;tV+=dt;if(curW){tW+=dt;if(tW>=curW.dur){curW=null;wCool=.04;R.rot=wrap(R.rot)}}else wCool=Math.max(0,wCool-dt);
  if(curW&&curW.pose){setTarget(curW.pose(tW));return}
  if(!curC&&!curV&&!curW){setTarget(IDLE);cloneOn=0;ghostOn=0;return}
