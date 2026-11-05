@@ -34,13 +34,18 @@ function warp(p,seg,v){
   while(nextMap*mapStep<=sp){map[nextMap++]=op}
   const t=sp/len;let r=base;
   if(q&&t>.62)r*=1+(t-.62)/.38*(.22+.11*q);
-  if(til&&t>.72){r*=(.62-.05*til)*(1+.16*Math.sin(op/SR*TAU_V*5))}
+  if(til&&t>.5){r*=1+(.14+.035*til)*Math.sin(op/SR*TAU_V*(5.5+.4*til))}
   if(seg.dots)r*=1-.22*t;
   if(wob)r*=1+wob*.09*Math.sin(op/SR*TAU_V*6.5);
   const i=sp|0,e=sp-i;o[op++]=pcm[i]+(pcm[i+1]-pcm[i])*e;sp+=r}
  while(nextMap<map.length)map[nextMap++]=op;
  return{pcm:o.subarray(0,op),toOut:s=>map[Math.min(map.length-1,Math.max(0,Math.floor(s/mapStep)))]}}
 const TAU_V=Math.PI*2;
+/* 물결표: 끝 부분을 짧은 조각으로 겹쳐 늘이고 소리 크기를 울렁이게 한다 */
+function wobbleTail(x,n){const st=Math.floor(x.length*.62),tail=x.length-st,ratio=1.5+.28*n,G=Math.round(SR*.05),hopOut=Math.round(G/4),hopIn=Math.max(1,Math.round(hopOut/ratio)),outLen=Math.round(tail*ratio)+G,o=new Float32Array(st+outLen);o.set(x.subarray(0,st));const w=new Float32Array(outLen);
+ for(let s=0,ip=st,op=0;op<outLen-G&&ip<x.length-G;s++,ip+=hopIn,op+=hopOut)for(let i=0;i<G;i++){const h=.5-.5*Math.cos(TAU_V*i/G);o[st+op+i]+=x[ip+i]*h;w[op+i]+=h}
+ for(let i=0;i<outLen;i++){if(w[i]>.05)o[st+i]/=w[i];const t=i/SR,e=Math.min(1,(outLen-i)/(SR*.08));o[st+i]*=(.72+.28*Math.sin(TAU_V*(6+.4*n)*t))*e}
+ return{pcm:o,map:s=>s<=st?s:st+(s-st)*ratio}}
 function jamoEvents(spoken,ev,toOut,offsetMs,charOff,wordBase,total){
  const chars=[...spoken],words=ev.filter(e=>e.type==='word');
  const ms=a=>a/1000*SR;const stops=ev.filter(e=>e.type==='word'||e.type==='end').map(e=>e.audio_position).sort((a,b)=>a-b);const out=[];
@@ -56,10 +61,11 @@ function buildSpeech(raw,v){
   const p=synthSeg(spoken,seg,v),w=warp(p,seg,v),ex=Math.min(seg.ex,6),gain=.62+.075*ex,drive=1.1+ex*.42;
   const out=new Float32Array(w.pcm.length);let pk=0;for(let i=0;i<out.length;i++)pk=Math.max(pk,Math.abs(w.pcm[i]));const d=drive/(pk||1);
   for(let i=0;i<out.length;i++){let x=Math.tanh(w.pcm[i]*d);if(v.robot)x=x*(1-v.robot)+x*v.robot*Math.sin(TAU_V*72*i/SR);out[i]=x*gain}
-  const off=text?[...text].length+1:0;events.push(...jamoEvents(spoken,p.ev,w.toOut,t,off,wordBase,p.len).map(e=>({...e,ex,q:Math.min(seg.q,5),til:Math.min(seg.til,6),dots:seg.dots})));
+  let finalOut=out,mapT=s=>w.toOut(s);if(seg.til){const r=wobbleTail(out,Math.min(seg.til,6));finalOut=r.pcm;mapT=s=>r.map(w.toOut(s))}
+  const off=text?[...text].length+1:0;events.push(...jamoEvents(spoken,p.ev,mapT,t,off,wordBase,p.len).map(e=>({...e,ex,q:Math.min(seg.q,5),til:Math.min(seg.til,6),dots:seg.dots})));
   wordBase+=spoken.split(' ').length;text+=(text?' ':'')+spoken;
   {let best=null;for(const[word,name]of Object.entries(SPECIALS)){const i=seg.raw.indexOf(word);if(i>=0&&(!best||i<best.i))best={i,word,name}}if(best)specials.push({ms:t,word:best.word,name:best.name})}
-  parts.push(out);t+=out.length/SR*1000;const gap=seg.dots?.28:.09;parts.push(new Float32Array(Math.round(gap*SR)));t+=gap*1000}
+  parts.push(finalOut);t+=finalOut.length/SR*1000;const gap=seg.dots?.28:.09;parts.push(new Float32Array(Math.round(gap*SR)));t+=gap*1000}
  const n=parts.reduce((a,p)=>a+p.length,0),pcm=new Float32Array(n);let o=0;for(const p of parts){pcm.set(p,o);o+=p.length}
  events.sort((a,b)=>a.ms-b.ms);let mix=pcm;
  if(specials.length){const sp=specials[0];specials.length=1;const beat=Beat.get(SR,16),st=Math.round(sp.ms/1000*SR),L=Math.round(16*60/Beat.BPM*SR),len=Math.max(n,st+L+SR/4|0);mix=new Float32Array(len);mix.set(pcm);for(let i=0;i<L;i++){const e=Math.min(1,(L-i)/(SR*.15));mix[st+i]+=beat[i]*.85*e}}
