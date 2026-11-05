@@ -58,7 +58,7 @@ function buildSpeech(raw,v){
   for(let i=0;i<out.length;i++){let x=Math.tanh(w.pcm[i]*d);if(v.robot)x=x*(1-v.robot)+x*v.robot*Math.sin(TAU_V*72*i/SR);out[i]=x*gain}
   const off=text?[...text].length+1:0;events.push(...jamoEvents(spoken,p.ev,w.toOut,t,off,wordBase,p.len).map(e=>({...e,ex,q:Math.min(seg.q,5),til:Math.min(seg.til,6),dots:seg.dots})));
   wordBase+=spoken.split(' ').length;text+=(text?' ':'')+spoken;
-  for(const[word,name]of Object.entries(SPECIALS))if(seg.raw.includes(word))specials.push({ms:t,word,name});
+  {let best=null;for(const[word,name]of Object.entries(SPECIALS)){const i=seg.raw.indexOf(word);if(i>=0&&(!best||i<best.i))best={i,word,name}}if(best)specials.push({ms:t,word:best.word,name:best.name})}
   parts.push(out);t+=out.length/SR*1000;const gap=seg.dots?.28:.09;parts.push(new Float32Array(Math.round(gap*SR)));t+=gap*1000}
  const n=parts.reduce((a,p)=>a+p.length,0),pcm=new Float32Array(n);let o=0;for(const p of parts){pcm.set(p,o);o+=p.length}
  events.sort((a,b)=>a.ms-b.ms);let mix=pcm;
