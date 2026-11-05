@@ -11,7 +11,6 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--hand);f
 h1{position:absolute;left:16px;top:18px;margin:0;font-family:var(--title);font-weight:400;font-size:clamp(46px,10vw,76px);line-height:.95;transform:rotate(-4deg);transform-origin:left top;pointer-events:none;width:3.4em}
 h1 mark{background:var(--neon-y);color:inherit;padding:0 .08em}
 #jamo{position:absolute;right:16px;top:8px;font-family:var(--stamp);font-size:clamp(84px,19vw,150px);line-height:1;color:var(--neon-p);-webkit-text-stroke:2px var(--ink);pointer-events:none}
-#move{position:absolute;right:16px;top:clamp(100px,22vw,168px);background:var(--ink);color:var(--neon-y);font-weight:700;padding:1px 10px;transform:rotate(3deg);pointer-events:none;max-width:48%}
 #sub{position:absolute;left:0;right:0;bottom:6px;padding-inline:16px;text-align:center;font-weight:700;font-size:clamp(18px,3.6vw,24px);pointer-events:none;overflow-wrap:anywhere;max-height:3.2em;overflow:hidden}
 #sub span.t{background:var(--paper);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 6px}
 #sub b{background:var(--neon-p)}
@@ -26,15 +25,11 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--neon-p);outli
 #go:active{transform:translate(4px,5px);box-shadow:1px 1px 0 var(--ink)}
 #go[data-on="1"]{background:var(--neon-y)}
 #go:disabled{background:var(--line);cursor:wait}
-#bgm,#share{min-height:64px;padding:0 16px;font-weight:700;font-size:20px;background:var(--neon-y);border:3px solid var(--ink);border-radius:225px 18px 255px 18px/18px 255px 18px 225px}
-#bgm[aria-pressed="false"]{background:var(--paper)}
+#share{min-height:64px;padding:0 16px;font-weight:700;font-size:20px;background:var(--neon-y);border:3px solid var(--ink);border-radius:225px 18px 255px 18px/18px 255px 18px 225px}
 #msg{min-height:1.4em;color:var(--soft);font-weight:700;overflow-wrap:anywhere}
 #msg.err{color:#c4006e}
 details{border-top:3px solid var(--ink);padding-top:8px}
 summary{font-family:var(--stamp);font-size:24px;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin-top:10px}
-.cell{min-width:0;min-height:42px;padding:4px 10px;text-align:left;background:var(--paper);border:2px solid var(--ink);border-radius:12px 5px 12px 5px;font-weight:700;line-height:1.15}
-.cell[aria-pressed="true"]{background:var(--ink);color:var(--neon-y)}
 .dress-tools,.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .dress-tools button,.chip{padding:4px 14px;background:var(--neon-y);border:2px solid var(--ink);border-radius:18px 8px 18px 8px;font-weight:700}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--neon-y)}

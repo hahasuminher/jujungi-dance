@@ -15,7 +15,6 @@
     <canvas id="cv" aria-label="입력한 말에 맞춰 춤추는 무표정한 아저씨" role="img"></canvas>
     <h1>주둥이 <mark>댄스</mark></h1>
     <div id="jamo" aria-hidden="true"></div>
-    <div id="move" hidden></div>
     <div id="sub"></div>
   </div>
   <form id="f">
@@ -23,14 +22,10 @@
     <textarea id="say" maxlength="300">아 진짜 퇴근하고 싶다!!! 나 왜 이래???</textarea>
     <div class="row">
       <button id="go" type="submit" disabled>목 푸는 중</button>
-      <button id="bgm" type="button" aria-pressed="true">둠칫 켬</button>
       <button id="share" type="button">내 춤 공유</button>
     </div>
     <div id="msg" role="status"></div>
   </form>
-  <details open><summary>아저씨 꾸미기</summary>
-    <div class="dress-tools"><button id="dressRandom" type="button">아무거나 입히기</button><button id="dressClear" type="button">다 벗기기</button></div>
-    <div id="dress" class="grid"></div></details>
   <details><summary>목소리 만들기</summary>
     <div id="presets" class="chips"></div>
     <div id="sliders" class="sliders"></div>
