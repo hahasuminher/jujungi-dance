@@ -1,17 +1,12 @@
 /* 음성: eSpeak NG로 말을 합성한 뒤 문장부호와 목소리 설정에 맞게 변조한다 */
 let engine=null;
 const SR=22050;
-const VOICE_DEFAULT={id:'helium',name:'헬륨 쪼꼬미',pitch:85,rate:135,range:90,speed:1.32,wobble:0,robot:0};
+const VOICE_DEFAULT={id:'helium',name:'헬륨 쪼꼬미',pitch:70,rate:122,range:70,speed:1.22,wobble:0,robot:0};
 const VOICE_PRESETS=[VOICE_DEFAULT,
- {id:'greasy',name:'느끼한 아저씨',pitch:25,rate:125,range:95,speed:.8,wobble:.5,robot:0},
- {id:'robot',name:'고장난 로봇',pitch:45,rate:140,range:10,speed:1,wobble:.15,robot:.55},
- {id:'grim',name:'저승사자',pitch:5,rate:105,range:15,speed:.72,wobble:.1,robot:.08},
- {id:'grandma',name:'동네 할머니',pitch:62,rate:120,range:99,speed:.96,wobble:.75,robot:0},
- {id:'baby',name:'옹알이 아기',pitch:99,rate:115,range:99,speed:1.55,wobble:.2,robot:0},
- {id:'alien',name:'외계인',pitch:72,rate:150,range:60,speed:1.16,wobble:.35,robot:.82},
- {id:'drunk',name:'취한 아저씨',pitch:32,rate:98,range:90,speed:.84,wobble:.95,robot:0},
- {id:'anchor',name:'뉴스 앵커',pitch:52,rate:175,range:28,speed:1.02,wobble:0,robot:0},
- {id:'mosquito',name:'모기',pitch:99,rate:170,range:35,speed:1.85,wobble:.5,robot:.2}];
+ {id:'anchor',name:'뉴스 앵커',pitch:52,rate:150,range:28,speed:1.02,wobble:0,robot:0},
+ {id:'greasy',name:'느끼한 아저씨',pitch:28,rate:150,range:80,speed:.9,wobble:.22,robot:0},
+ {id:'robot',name:'고장난 로봇',pitch:45,rate:138,range:10,speed:1,wobble:.08,robot:.35},
+ {id:'alien',name:'외계인',pitch:66,rate:135,range:55,speed:1.12,wobble:.14,robot:.3}];
 async function bootVoice(){
  const data=await (await fetch('vendor/espeak.data')).arrayBuffer();
  const m=await Promise.race([ESPEAK({getPreloadedPackage:()=>data,locateFile:f=>f,print(){},printErr(){}}),new Promise((_,no)=>setTimeout(()=>no(new Error('timeout')),15000))]);
@@ -65,7 +60,7 @@ function jamoEvents(spoken,ev,toOut,offsetMs,charOff,wordBase,total){
 function buildSpeech(raw,v,opt={}){
  const segs=splitSegments(raw);const parts=[];let text='',skipped=0,events=[],t=0,wordBase=0;const specials=[];
  for(const seg of segs){const r=toSpoken(seg.raw);skipped+=r.skipped;const spoken=r.spoken.replace(/[.,!?]/g,' ').replace(/\s+/g,' ').trim();if(!spoken||!/[가-힣]/.test(spoken))continue;
-  const p=synthSeg(spoken,seg,v),w=warp(p,seg,v),ex=Math.min(seg.ex,6),gain=.62+.075*ex,drive=1.1+ex*.42;
+  const p=synthSeg(spoken,seg,v),w=warp(p,seg,v),ex=Math.min(seg.ex,6),gain=.72+.065*ex,drive=.85+ex*.42;
   const out=new Float32Array(w.pcm.length);let pk=0;for(let i=0;i<out.length;i++)pk=Math.max(pk,Math.abs(w.pcm[i]));const d=drive/(pk||1);
   for(let i=0;i<out.length;i++){let x=Math.tanh(w.pcm[i]*d);if(v.robot)x=x*(1-v.robot)+x*v.robot*Math.sin(TAU_V*72*i/SR);out[i]=x*gain}
   let finalOut=out,mapT=s=>w.toOut(s);if(seg.til){const r=wobbleTail(out,Math.min(seg.til,6));finalOut=r.pcm;mapT=s=>r.map(w.toOut(s))}

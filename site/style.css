@@ -95,3 +95,4 @@ body.typing #dock{padding-bottom:8px}
 #aSing{position:fixed;z-index:4;left:16px;bottom:calc(238px + env(safe-area-inset-bottom,0px));padding:8px 18px;font-family:var(--stamp);font-size:22px;background:var(--neon-p);border:3px solid var(--ink);border-radius:18px 7px 18px 7px}
 #aSing[hidden]{display:none}body.in-club #aSing,body.typing #aSing{display:none}
 #singOpen{top:12%}#singOpen textarea{min-width:0;padding:8px 10px;font:inherit;font-size:18px;font-weight:700;border:3px solid var(--ink);border-radius:10px;resize:none;touch-action:auto}#singSongs{margin-top:2px;gap:6px}#singSongs .chip{padding:4px 9px}#singOpen small{color:var(--soft)}
+#singMode{margin-top:2px;gap:6px}#singLyr{display:flex;flex-direction:column;gap:6px}#singLyr[hidden]{display:none}
