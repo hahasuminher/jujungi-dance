@@ -21,7 +21,7 @@ function drawSub(){const el=$('sub'),a=[...subText];if(!a.length){el.textContent
 function stopAudio(){player.onended=null;player.pause();if('speechSynthesis'in window)speechSynthesis.cancel();play=null;events=[];evI=0;specials=[];spI=0}
 function finish(){stopAudio();Dance.relax();stopRec();$('jamo').textContent='';subI=-1;$('sub').textContent='';setBtn(false)}
 function setBtn(on){const b=$('go');b.dataset.on=on?'1':'0';b.textContent=on?'닥쳐':'주둥이 털기'}
-function speak(recording){if(recording!==true)recording=false;if(play){finish();Dance.stop();FX.stop();return}if(Dance.isBig()){Dance.stop();FX.stop()}const msg=$('msg');msg.textContent='';msg.className=''; const raw=$('say').value;const s=engine?buildSpeech(raw,voice):null;
+function speak(recording){if(recording!==true)recording=false;if(play){finish();Dance.stop();FX.stop();return}if(Dance.isBig()){Dance.stop();FX.stop()}const msg=$('msg');msg.textContent='';msg.className='';seed=(Math.random()*2**31)|0;Dance.reseed(seed); const raw=$('say').value;const s=engine?buildSpeech(raw,voice):null;
  if(engine&&(!s||!s.text)){msg.textContent='읽을 글자가 없어요. 한글, 영어, 숫자를 넣어 주세요.';msg.className='err';if(recording)endRec();return}
  if(recording&&!engine){msg.textContent='영상 저장에는 웃긴 목소리가 필요해요.';msg.className='err';endRec();return}
  if(s&&s.skipped)msg.textContent=`읽을 수 없는 글자 ${s.skipped}개는 건너뛰었어요.`;
@@ -39,7 +39,6 @@ const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g
 const dec=s=>JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/')))));
 const SITE=location.origin+location.pathname;
 $('share').onclick=async()=>{if(navigator.share){try{await navigator.share({title:'주둥이 댄스',text:'아무 말이나 외치면 아저씨가 춤춘다',url:SITE});return}catch(e){if(e.name==='AbortError')return}}try{await navigator.clipboard.writeText(SITE);$('msg').textContent='사이트 주소를 복사했어요.'}catch(e){$('msg').textContent=SITE}};
-$('shuffle').onclick=()=>{seed=(Math.random()*2**31)|0;Dance.reseed(seed);$('msg').className='';$('msg').textContent='자모별 춤을 새로 섞었어요.'};
 /* 영상 저장: 무대를 9:16 화면에 옮겨 그리며 녹화 */
 let rec=null;
 const VW=720,VH=1280;
@@ -66,4 +65,5 @@ fromLink();Dance.reseed(seed);drawVoice();showFound();
 (async()=>{await Promise.all(['A','B','C','D','E','F'].map(k=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[k]=i;r()};i.onerror=r;i.src=`assets/${k}.png`})));
  try{await bootVoice()}catch(e){console.warn(e);$('msg').textContent='웃긴 목소리를 불러오지 못해서 기기 기본 목소리로 말합니다.';$('msg').className='err'}
  $('go').disabled=false;$('go').textContent='주둥이 털기'})();
+if(document.fonts)document.fonts.load('400 60px "East Sea Dokdo"',Object.keys(SPECIALS).join('')+'!').catch(()=>{});
 requestAnimationFrame(loop);
