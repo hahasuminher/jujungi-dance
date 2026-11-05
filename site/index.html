@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-visual">
 <title>주둥이 댄스</title>
 <meta name="description" content="아무 말이나 입력하면 무표정한 아저씨가 헬륨 목소리로 외치며 춤을 춥니다.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
   </div>
   <form id="f">
     <label class="say" for="say">아무 말이나 쳐봐. 느낌표!!!를 많이 붙일수록 난리 난다.</label>
-    <textarea id="say" maxlength="300">아 진짜 퇴근하고 싶다!!! 나 왜 이래???</textarea>
+    <textarea id="say" maxlength="300">이 곳에 하고 싶은 말을 입력해 보세요~~</textarea>
     <div class="row">
       <button id="go" type="submit" disabled>목 푸는 중</button>
     </div>
@@ -36,19 +36,18 @@
     <div id="presets" class="chips"></div>
     <div id="sliders" class="sliders"></div>
     <div class="dress-tools"><button id="voiceTest" type="button">들어보기</button><button id="voiceSave" type="button">내 목소리 저장</button></div></details>
-  <details><summary>문장부호 사용법</summary>
-    <dl class="punct"><dt>!!!</dt><dd>많이 붙일수록 높고 거칠게 외칩니다.</dd><dt>???</dt><dd>끝이 올라가고 고개를 흔듭니다.</dd><dt>~~~</dt><dd>끝을 늘이고 몸을 꼬아댑니다.</dd><dt>...</dt><dd>힘이 빠지고 축 처집니다.</dd></dl></details>
   <p class="found" id="found"></p>
   <footer>음성 합성: <a href="https://github.com/espeak-ng/espeak-ng">eSpeak NG</a> (GPL-3.0). 이 사이트의 <a href="https://github.com/hahasuminher/jujungi-dance">소스 코드</a>는 GPL-3.0으로 공개되어 있습니다. 혼자 모드의 입력은 브라우저 안에서만 처리됩니다.</footer>
 </div>
 <div id="plazaUi">
   <div id="plazaTop"><strong id="roomInfo"></strong><span class="top-r"><button id="zOut" type="button" aria-label="축소">-</button><button id="zIn" type="button" aria-label="확대">+</button><button id="setBtn" type="button">설정</button></span></div>
-  <div id="setMenu" hidden><button id="beep" type="button" aria-pressed="true">욕 삐 처리 켬</button><label for="volume">볼륨<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label><button id="leave" type="button">광장 나가기</button></div>
+  <div id="setMenu" hidden><button id="beep" type="button" aria-pressed="true">욕 삐 처리 켬</button><label for="volume">볼륨<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label><strong>목소리</strong><div id="pVoices" class="chips"></div><button id="leave" type="button">광장 나가기</button></div>
   <div id="peerMenu" hidden><strong id="peerName"></strong><button id="peerMute" type="button">음소거</button><button id="peerReport" type="button">신고</button></div>
   <div id="pMsg" role="status"></div>
-  <div id="clubOpen" class="pop" hidden><strong>주둥이 클럽 열기</strong><label for="clubIn">클럽에서 반복할 말</label><input id="clubIn" maxlength="30" placeholder="30자까지, 비속어 금지" autocomplete="off"><div class="pop-row"><button id="clubGo" type="button">초대 보내기</button><button id="clubCancel" type="button">닫기</button></div></div>
+  <div id="clubOpen" class="pop" hidden><strong>주둥이 클럽 열기</strong><label for="clubIn">클럽에서 반복할 말</label><input id="clubIn" maxlength="30" placeholder="30자까지, 비속어 금지" autocomplete="off"><div id="clubThemes" class="chips"><button class="chip" type="button" data-t="edm" aria-pressed="true">EDM</button><button class="chip" type="button" data-t="hiphop" aria-pressed="false">힙합</button><button class="chip" type="button" data-t="disco" aria-pressed="false">디스코</button><button class="chip" type="button" data-t="trot" aria-pressed="false">트로트</button></div><div class="pop-row"><button id="clubGo" type="button">초대 보내기</button><button id="clubCancel" type="button">닫기</button></div></div>
   <div id="clubInvite" class="pop" hidden><strong>클럽 초대장</strong><span id="clubText"></span><div class="pop-row"><button id="clubYes" type="button">입장</button><button id="clubNo" type="button">거절</button></div></div>
   <button id="clubExit" type="button">클럽 나가기</button>
+  <button id="aPick" type="button" hidden></button>
   <div id="dock"><div class="reacts"><button type="button" data-react="ㅋㅋㅋ">ㅋㅋㅋ</button><button type="button" data-react="박수">박수</button><button type="button" data-react="야유">야유</button><button type="button" data-react="하트">하트</button></div>
    <div class="acts"><button id="aSit" type="button" aria-pressed="false">앉기</button><button id="aLie" type="button" aria-pressed="false">눕기</button><button id="aRide" type="button" aria-pressed="false">업히기</button><button id="aTrain" type="button" aria-pressed="false">기차</button><button id="aBanana" type="button">바나나</button><button id="aClub" type="button">클럽</button></div>
    <form id="pForm"><input id="pIn" maxlength="120" placeholder="광장에 외칠 말" autocomplete="off" aria-label="광장에 외칠 말"><button type="submit">외치기</button></form></div>

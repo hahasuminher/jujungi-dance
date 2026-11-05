@@ -23,18 +23,42 @@ const Beat=(()=>{const BPM=118,S=60/BPM/4,cache={};
    const mn=st.mel[s];if(mn&&(bar%2||name!=='dumchit')){const d=S*(st.slow?3.5:1.6);add(t,u=>wav1(mn,u,st.wave,st.vib)*Math.exp(-u*(st.slow?1.2:7))*Math.min(1,u*200)*Math.min(1,(d-u)*40),d,st.mv)}}
   for(let i=0;i<Nn;i++)x[i]=Math.tanh(x[i]*1.5);return x}
  return{get(sr,beats,name='dumchit'){const k=name+beats;if(!cache[k])cache[k]=render(sr,beats,name);return cache[k]},BPM}})();
-/* 클럽 EDM: 128BPM 8마디를 합성해 필요한 길이로 반복 */
-const EDM=(()=>{const BPM=128,B=60/BPM;let cache=null;
- function bars(sr){const N=Math.round(B*32*sr),x=new Float32Array(N);const CH=[[110,130.8,164.8],[87.3,130.8,174.6],[98,146.8,196],[82.4,123.5,164.8]];let lp=0;
+/* 클럽 음악: 테마마다 32박 루프를 합성해 필요한 길이로 반복 */
+const EDM=(()=>{const BPMS={edm:128,hiphop:88,disco:118,trot:126},cache={},TAU=Math.PI*2,mf=m=>440*2**((m-69)/12);
+ function edmBars(sr){const B=60/128;const N=Math.round(B*32*sr),x=new Float32Array(N);const CH=[[110,130.8,164.8],[87.3,130.8,174.6],[98,146.8,196],[82.4,123.5,164.8]];let lp=0;
   for(let i=0;i<N;i++){const t=i/sr,b=t/B,bb=b%1,bar=Math.floor(b/4)%4,c=CH[bar],k=48+120*Math.exp(-bb*B*30),ks=Math.sin(2*Math.PI*k*bb*B)*Math.exp(-bb*B*11);
    const off=(b+.5)%1,bf=c[0]/2,bass=(2*((t*bf)%1)-1)*Math.min(1,off*7)*Math.exp(-off*2.2)*.5;
    let saw=0;for(const f of c)for(const d of[.995,1,1.006])saw+=2*((t*f*2*d)%1)-1;saw/=9;const gate=(b*2)%1<.55?1:.12;lp+=.22*(saw*gate-lp);
    const hat=((b*2)%1<.08?1:0)*(Math.random()*2-1)*.14,clap=(Math.floor(b)%2===1&&bb<.12)?(Math.random()*2-1)*Math.exp(-bb*30)*.32:0;
    const sweep=bar===3?Math.sin(2*Math.PI*t*(600+900*((b%4)/4)))*.06*((b%4)/4):0;
    x[i]=Math.tanh(ks*.95+bass+lp*.55+hat+clap+sweep)}return x}
- return{BPM,make(sr,secs){if(!cache)cache=bars(sr);const N=Math.round(secs*sr),o=new Float32Array(N);for(let i=0;i<N;i++)o[i]=cache[i%cache.length]*.72;return o}}})();
+ function kit(sr,bpm){const B=60/bpm,N=Math.round(B*32*sr),x=new Float32Array(N),add=(at,dur,fn)=>{const i0=Math.round(at*sr),n=Math.round(dur*sr);for(let i=0;i<n;i++)x[(i0+i)%N]+=fn(i/sr)*Math.min(1,(dur-i/sr)*60)};
+  return{B,N,x,add,kick:(at,f=48,g=.95)=>add(at,.3,t=>Math.sin(TAU*(f*t+(130/26)*(1-Math.exp(-t*26))))*Math.exp(-t*12)*g),
+   snare:(at,g=.42)=>add(at,.2,t=>((Math.random()*2-1)*.8+Math.sin(TAU*190*t)*.6)*Math.exp(-t*17)*g),
+   hat:(at,g=.13,d=70)=>{let l=0;add(at,.1+14/d,t=>{const r=Math.random()*2-1,h=r-l;l=r;return h*Math.exp(-t*d)*g})},
+   tone:(at,dur,f,g,fn)=>add(at,dur,t=>fn(t,f)*g),finish(){for(let i=0;i<N;i++)x[i]=Math.tanh(x[i]*1.05);return x}}}
+ function hiphopBars(sr){const k=kit(sr,88),{B}=k,sw=s=>(s%2?s+.3:s)*B/4,CH=[[57,60,64],[53,57,60],[55,59,62],[52,55,59]],BASS=[33,29,31,28];
+  for(let bar=0;bar<8;bar++){const o=bar*16,ch=CH[bar%4],r=BASS[bar%4];for(const st of[0,7,10])k.kick(sw(o+st),46);for(const st of[4,12])k.snare(sw(o+st),.5);for(let st=0;st<16;st+=2)k.hat(sw(o+st),st%4===2?.16:.09,st%8===6?22:80);
+   k.tone(sw(o),B*1.6,mf(r),.62,(t,f)=>Math.sin(TAU*f*t)*Math.exp(-t*1.9));k.tone(sw(o+10),B*.9,mf(r),.5,(t,f)=>Math.sin(TAU*f*t)*Math.exp(-t*3));
+   for(const st of[0,3,6])for(const n of ch)k.tone(sw(o+st),.32,mf(n),.1,(t,f)=>(Math.sin(TAU*f*t)+.4*Math.sin(TAU*2*f*t)+.2*Math.sin(TAU*3.01*f*t))*Math.exp(-t*9));
+   if(bar%2)for(const[st,n]of[[8,76],[11,79],[14,81]])k.tone(sw(o+st),.3,mf(n),.1,(t,f)=>Math.sin(TAU*f*t)*Math.exp(-t*12))}
+  return k.finish()}
+ function discoBars(sr){const k=kit(sr,118),{B}=k,CH=[[62,65,69,72],[55,59,62,65],[60,64,67,71],[57,60,64,67]],BASS=[38,31,36,33];
+  for(let bar=0;bar<8;bar++){const o=bar*4,ch=CH[bar%4],r=BASS[bar%4];for(let b=0;b<4;b++){k.kick((o+b)*B,52,.82);k.hat((o+b+.5)*B,.17,16);k.hat((o+b+.25)*B,.06);k.hat((o+b+.75)*B,.06);if(b%2)k.snare((o+b)*B,.34)}
+   for(let e=0;e<8;e++)k.tone((o+e/2)*B,B*.42,mf(r+(e%2?12:0)),.3,(t,f)=>(2*((t*f)%1)-1)*.55*Math.exp(-t*6));
+   for(const st of[1.5,3,6.5,10,13.5])for(const n of ch)k.tone((o+st/4)*B,.13,mf(n+12),.055,(t,f)=>(2*((t*f)%1)-1)*Math.exp(-t*16));
+   for(const n of ch)k.tone(o*B,B*4,mf(n),.03,(t,f)=>(Math.sin(TAU*f*1.004*t)+Math.sin(TAU*f*.996*t))*Math.min(1,t*2))}
+  return k.finish()}
+ function trotBars(sr){const k=kit(sr,126),{B}=k,CH=[[57,60,64],[62,65,69],[52,56,59],[57,60,64]],BASS=[[33,40],[38,45],[28,35],[33,40]],M=[[0,69,1],[1,72,.5],[1.5,74,.5],[2,76,1.5],[3.5,74,.5],[4,72,1],[5,74,.5],[5.5,72,.5],[6,69,2],[8,74,1],[9,77,.5],[9.5,76,.5],[10,74,1.5],[11.5,72,.5],[12,71,1],[13,72,.5],[13.5,74,.5],[14,76,2],[16,76,.5],[16.5,79,.5],[17,81,1],[18,79,.5],[18.5,76,.5],[19,74,1],[20,72,1],[21,74,.5],[21.5,76,.5],[22,74,2],[24,76,1],[25,74,.5],[25.5,72,.5],[26,71,1.5],[27.5,72,.5],[28,69,3]],org=(t,f)=>{const v=1+.006*Math.sin(TAU*5.6*t),p=t*f*v;return(2*(p%1)-1)*.45+(((p*2)%1)<.5?.3:-.3)};
+  for(let bar=0;bar<8;bar++){const o=bar*4,ch=CH[bar%4],b=BASS[bar%4];k.kick(o*B,58,.85);k.kick((o+2)*B,58,.78);k.snare((o+1)*B,.3);k.snare((o+3)*B,.34);for(let e=0;e<8;e++)k.hat((o+e/2)*B,e%2?.11:.05,60);
+   k.tone(o*B,B*.8,mf(b[0]),.4,(t,f)=>Math.sin(TAU*f*t)*Math.exp(-t*3));k.tone((o+2)*B,B*.8,mf(b[1]),.36,(t,f)=>Math.sin(TAU*f*t)*Math.exp(-t*3));
+   for(const st of[1,3])for(const n of ch)k.tone((o+st)*B,.17,mf(n),.075,org)}
+  for(const[st,n,l]of M)k.tone(st*B,l*B*.92,mf(n),.26,org);
+  return k.finish()}
+ const MK={edm:edmBars,hiphop:hiphopBars,disco:discoBars,trot:trotBars};
+ return{bpm:t=>BPMS[t]||128,make(sr,secs,t='edm'){if(!MK[t])t='edm';const c=cache[t]||(cache[t]=MK[t](sr)),N=Math.round(secs*sr),o=new Float32Array(N);for(let i=0;i<N;i++)o[i]=c[i%c.length]*.72;return o}}})();
 /* 박치기 효과음 */
 const Sfx=(()=>{const sr=22050,mk=(dur,fn)=>{const n=Math.round(dur*sr),o=new Float32Array(n);for(let i=0;i<n;i++)o[i]=fn(i/sr)*Math.min(1,(dur-i/sr)*40);return o};
- const SND={'퍽!':()=>{let y=0;return mk(.16,t=>{y+=.3*((Math.random()*2-1)-y);return(y*2.4+Math.sin(2*Math.PI*150*t)*.8)*Math.exp(-t*26)})},'쿵!':()=>mk(.34,t=>Math.sin(2*Math.PI*(44+90*Math.exp(-t*20))*t)*Math.exp(-t*9)*1.1),'뽁!':()=>mk(.13,t=>Math.sin(2*Math.PI*(260+1500*t*t*40)*t)*Math.exp(-t*24))};
+ const SND={'깡!':()=>{let y=0;return mk(.55,t=>{y+=.5*((Math.random()*2-1)-y);return y*2.2*Math.exp(-t*70)+(Math.sin(2*Math.PI*1760*t)*.5+Math.sin(2*Math.PI*2640*t)*.35+Math.sin(2*Math.PI*3970*t)*.2)*Math.exp(-t*9)})},'빡!':()=>{let y=0;return mk(.14,t=>{y+=.6*((Math.random()*2-1)-y);return(y*3+Math.sin(2*Math.PI*620*t)*.7)*Math.exp(-t*34)})},'삐융!':()=>{let p=0;return mk(.7,t=>{p+=(2100-1500*t/.7+60*Math.sin(t*60))/sr;return Math.sin(2*Math.PI*p)*.75*Math.min(1,t*30)})},'퍽!':()=>{let y=0;return mk(.16,t=>{y+=.3*((Math.random()*2-1)-y);return(y*2.4+Math.sin(2*Math.PI*150*t)*.8)*Math.exp(-t*26)})},'쿵!':()=>mk(.34,t=>Math.sin(2*Math.PI*(44+90*Math.exp(-t*20))*t)*Math.exp(-t*9)*1.1),'뽁!':()=>mk(.13,t=>Math.sin(2*Math.PI*(260+1500*t*t*40)*t)*Math.exp(-t*24))};
  const urls={},el=new Audio();el.preload='auto';el.setAttribute('playsinline','');
  return{unlock(){if(!Object.keys(urls).length){for(const k in SND)urls[k]=URL.createObjectURL(wav(SND[k](),sr));try{if(engine){const s=buildSpeech('아야',VOICE_DEFAULT);urls['아야!']=URL.createObjectURL(wav(s.pcm,SR))}}catch(e){}}el.src=urls['쿵!'];el.volume=0;el.play().catch(()=>{})},play(k,v){if(!urls[k])return;el.pause();el.src=urls[k];el.volume=Math.max(0,Math.min(1,v));el.play().catch(()=>{})}}})();
