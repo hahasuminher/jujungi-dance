@@ -32,10 +32,6 @@
   </form>
   <details id="rules"><summary>광장 규칙</summary>
     <p class="rule">광장에서는 다른 사람의 외침이 그대로 들립니다. 욕은 기본으로 삐 처리되고, 성적인 말, 혐오 표현, 개인정보, 링크는 전송되지 않습니다. 금칙어 검사가 모든 공격을 막지는 못하니 불쾌한 외침은 음소거나 신고를 눌러 주세요. 규칙을 읽었다면 광장 입장을 한 번 더 누르세요.</p></details>
-  <section id="plazaBar" hidden>
-    <div class="plaza-top"><strong id="roomInfo"></strong><button id="beep" type="button" aria-pressed="true">욕 삐 처리 켬</button><label class="vol" for="volume">볼륨<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label></div>
-    <ul id="log"></ul>
-  </section>
   <details><summary>목소리 만들기</summary>
     <div id="presets" class="chips"></div>
     <div id="sliders" class="sliders"></div>
@@ -44,6 +40,14 @@
     <dl class="punct"><dt>!!!</dt><dd>많이 붙일수록 높고 거칠게 외칩니다.</dd><dt>???</dt><dd>끝이 올라가고 고개를 흔듭니다.</dd><dt>~~~</dt><dd>끝을 늘이고 몸을 꼬아댑니다.</dd><dt>...</dt><dd>힘이 빠지고 축 처집니다.</dd></dl></details>
   <p class="found" id="found"></p>
   <footer>음성 합성: <a href="https://github.com/espeak-ng/espeak-ng">eSpeak NG</a> (GPL-3.0). 이 사이트의 <a href="https://github.com/hahasuminher/jujungi-dance">소스 코드</a>는 GPL-3.0으로 공개되어 있습니다. 혼자 모드의 입력은 브라우저 안에서만 처리됩니다.</footer>
+</div>
+<div id="plazaUi">
+  <div id="plazaTop"><strong id="roomInfo"></strong><button id="setBtn" type="button">설정</button></div>
+  <div id="setMenu" hidden><button id="beep" type="button" aria-pressed="true">욕 삐 처리 켬</button><label for="volume">볼륨<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label><button id="leave" type="button">광장 나가기</button></div>
+  <div id="peerMenu" hidden><strong id="peerName"></strong><button id="peerMute" type="button">음소거</button><button id="peerReport" type="button">신고</button></div>
+  <div id="pMsg" role="status"></div>
+  <div id="dock"><div class="reacts"><button type="button" data-react="ㅋㅋㅋ">ㅋㅋㅋ</button><button type="button" data-react="박수">박수</button><button type="button" data-react="야유">야유</button><button type="button" data-react="하트">하트</button></div>
+   <form id="pForm"><input id="pIn" maxlength="120" placeholder="광장에 외칠 말" autocomplete="off" aria-label="광장에 외칠 말"><button type="submit">외치기</button></form></div>
 </div>
 <script src="boot.js"></script>
 </body>

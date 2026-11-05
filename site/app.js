@@ -8,20 +8,20 @@ new ResizeObserver(size).observe(cv);size();
 let play=null,events=[],evI=0,specials=[],spI=0,subText='',subI=-1,lastHalf=-1,tick=-1,burstHue=0,lastWord=-1,lastBurst=0,burst=0,last=performance.now();
 const player=new Audio();player.preload='auto';player.setAttribute('playsinline','');let wavUrl=null;
 function wav(pcm,sr){const n=pcm.length,b=new ArrayBuffer(44+n*2),v=new DataView(b),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);for(let i=0;i<n;i++)v.setInt16(44+i*2,Math.max(-1,Math.min(1,pcm[i]))*32767,true);return new Blob([b],{type:'audio/wav'})}
-function render(now){g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle='#fff';g.fillRect(0,0,W,Ht);const S=Math.min(Ht*.78/1790,W*.8/1340),ox=W/2,oy=Ht*.54;
+function render(now){g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle='#fff';g.fillRect(0,0,W,Ht);if(Plaza.isOn())burst=0;const S=Math.min(Ht*.78/1790,W*.8/1340),ox=W/2,oy=Ht*.54;
  if(burst>.05){const R0=Math.max(W,Ht)*.42*burst,n=13,rot=calm?0:Math.floor(now/110)*.13;g.beginPath();for(let i=0;i<n*2;i++){const a=rot+i*Math.PI/n,r=R0*(i%2?.62:1);i?g.lineTo(ox+Math.cos(a)*r,oy+Math.sin(a)*r):g.moveTo(ox+Math.cos(a)*r,oy+Math.sin(a)*r)}g.closePath();g.fillStyle=burstHue?'#ff2bb3':'#f4ff1f';g.fill()}
- const bt=Dance.isBig()?Dance.bigBeat():0;const sh=!calm&&FX.shake();if(sh)g.translate(Math.sin(now/27)*7,Math.cos(now/21)*6);FX.back(g,bt);Plaza.crowd(g,W,Ht,S,tick,(c,x,y,sc,sp)=>{if(Dance.isBig())Dance.copy(c,x,y,sc,tick);else drawChar(c,sp?{...REST,al:2.4,ar:2.4}:REST,x,y,sc,{boil:calm?0:5,seed:tick*13%4000})});Dance.render(g,W,Ht,S,ox,oy,tick,calm,burstHue);FX.front(g,bt,Dance.eyes(W,Ht,S,ox,oy),calm)}
+ const bt=Dance.isBig()?Dance.bigBeat():0;const sh=!calm&&FX.shake();if(sh)g.translate(Math.sin(now/27)*7,Math.cos(now/21)*6);FX.back(g,bt);if(Plaza.isOn()){const e=Plaza.draw(g,W,Ht,now,tick,calm,burstHue,bt,Dance.isBig());FX.front(g,bt,e?Dance.eyes(W,Ht,e[0],e[1],e[2]):null,calm);return}Dance.render(g,W,Ht,S,ox,oy,tick,calm,burstHue);FX.front(g,bt,Dance.eyes(W,Ht,S,ox,oy),calm)}
 function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;
  if(play){const ms=play.clock();while(evI<events.length&&events[evI].ms<=ms)fire(events[evI++]);while(spI<specials.length&&specials[spI].ms<=ms){const sp=specials[spI++];if(Dance.big(sp.name))FX.start(sp.name,sp.word,W,Ht);if(!found.has(sp.word)){found.add(sp.word);store.set('jd.found',[...found]);showFound()}}if(ms>=play.total)finish()}
- Dance.update(dt,now);if(FX.isOn()&&!Dance.isBig())FX.stop();FX.update(dt,W,Ht);if(Dance.isBig()&&Math.floor(Dance.bigBeat()/2)!==lastHalf){lastHalf=Math.floor(Dance.bigBeat()/2);burstHue=1-burstHue}burst+=(((play||Dance.isBig())?1:0)-burst)*.14;
+ Dance.update(dt,now);if(Plaza.isOn())Plaza.update(dt);if(FX.isOn()&&!Dance.isBig())FX.stop();FX.update(dt,W,Ht);if(Dance.isBig()&&Math.floor(Dance.bigBeat()/2)!==lastHalf){lastHalf=Math.floor(Dance.bigBeat()/2);burstHue=1-burstHue}burst+=(((play||Dance.isBig())?1:0)-burst)*.14;
  tick=Math.floor(now/110);render(now);if(rec&&rec.mr)drawFrame();requestAnimationFrame(loop)}
 function fire(e){const j=$('jamo');j.textContent=e.j;if(!calm)j.style.transform=`rotate(${(Math.random()*26-13).toFixed(1)}deg) scale(${(.9+Math.random()*.25+e.ex*.05).toFixed(2)})`;Dance.event(e);
  if(e.idx!==subI){subI=e.idx;drawSub()}const t=performance.now();if(e.word!==lastWord&&t-lastBurst>340){lastBurst=t;lastWord=e.word;burstHue=1-burstHue}}
 function drawSub(){const el=$('sub'),a=[...subText];if(!a.length){el.textContent='';return}const st=Math.max(0,subI-34),en=Math.min(a.length,st+60),h=document.createElement('b');h.textContent=a[subI]||'';const t=document.createElement('span');t.className='t';t.append(a.slice(st,Math.max(st,subI)).join(''),h,a.slice(subI+1,en).join(''));el.replaceChildren(t)}
 function stopAudio(){player.onended=null;player.pause();if('speechSynthesis'in window)speechSynthesis.cancel();play=null;events=[];evI=0;specials=[];spI=0}
 function finish(){stopAudio();Dance.relax();stopRec();if(extPlaying){extPlaying=false;Plaza.done()}$('jamo').textContent='';subI=-1;$('sub').textContent='';setBtn(false)}
-function setBtn(on){const b=$('go');if(Plaza.isOn())on=false;b.dataset.on=on?'1':'0';b.textContent=on?'닥쳐':'주둥이 털기'}
-function speak(recording,ext){if(recording!==true)recording=false;if(!ext&&!recording&&Plaza.isOn()){Plaza.shout($('say').value,{...voice});return}if(play){finish();Dance.stop();FX.stop();return}if(Dance.isBig()){Dance.stop();FX.stop()}const msg=$('msg');msg.textContent='';msg.className='';seed=(Math.random()*2**31)|0;Dance.reseed(seed); const raw=ext?ext.raw:$('say').value;const s=engine?buildSpeech(raw,ext?{...VOICE_DEFAULT,...ext.voice}:voice):null;
+function setBtn(on){const b=$('go');b.dataset.on=on?'1':'0';b.textContent=on?'닥쳐':'주둥이 털기'}
+function speak(recording,ext){if(recording!==true)recording=false;if(play){finish();Dance.stop();FX.stop();return}if(Dance.isBig()){Dance.stop();FX.stop()}const msg=$('msg');msg.textContent='';msg.className='';seed=(Math.random()*2**31)|0;Dance.reseed(seed); const raw=ext?ext.raw:$('say').value;const s=engine?buildSpeech(raw,ext?{...VOICE_DEFAULT,...ext.voice}:voice):null;
  if(engine&&(!s||!s.text)){msg.textContent='읽을 글자가 없어요. 한글, 영어, 숫자를 넣어 주세요.';msg.className='err';if(recording)endRec();return}
  if(recording&&!engine){msg.textContent='영상 저장에는 웃긴 목소리가 필요해요.';msg.className='err';endRec();return}
  if(s&&s.skipped)msg.textContent=`읽을 수 없는 글자 ${s.skipped}개는 건너뛰었어요.`;
@@ -39,7 +39,7 @@ const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g
 const dec=s=>JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/')))));
 let volume=1,extPlaying=false;
 function unlockAudio(){player.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAA=';player.play().catch(()=>{})}
-const App={speakText(raw,v,who){if(!engine)return false;if(play){finish()}extPlaying=true;speak(false,{raw,voice:v});if(!play){extPlaying=false;return false}return true},setVolume(v){volume=v;player.volume=v}};
+const App={speakText(raw,v,who){if(!engine)return false;if(play){finish()}extPlaying=true;speak(false,{raw,voice:v});if(!play){extPlaying=false;return false}return true},setSpeechVolume(v){volume=v;player.volume=v},resize(){setTimeout(size,30)}};
 const SITE=location.origin+location.pathname;
 $('share').onclick=async()=>{if(navigator.share){try{await navigator.share({title:'주둥이 댄스',text:'아무 말이나 외치면 아저씨가 춤춘다',url:SITE});return}catch(e){if(e.name==='AbortError')return}}try{await navigator.clipboard.writeText(SITE);$('msg').textContent='사이트 주소를 복사했어요.'}catch(e){$('msg').textContent=SITE}};
 /* 영상 저장: 무대를 9:16 화면에 옮겨 그리며 녹화 */
@@ -64,7 +64,7 @@ function fromLink(){const m=location.hash.match(/^#d=(.+)/);if(!m)return;try{con
 function showFound(){const n=Object.keys(SPECIALS).length;$('found').textContent=found.size?`숨은 단어 ${n}개 중 ${found.size}개 발견`:`숨은 단어가 ${n}개 있습니다. 찾아보세요.`}
 $('f').addEventListener('submit',e=>{e.preventDefault();speak()});
 $('say').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('f').requestSubmit()}});
-fromLink();Dance.reseed(seed);drawVoice();Plaza.init();showFound();
+fromLink();Dance.reseed(seed);drawVoice();Plaza.init(cv);showFound();
 (async()=>{await Promise.all(['A','B','C','D','E','F'].map(k=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[k]=i;r()};i.onerror=r;i.src=`assets/${k}.png`})));
  try{await bootVoice()}catch(e){console.warn(e);$('msg').textContent='웃긴 목소리를 불러오지 못해서 기기 기본 목소리로 말합니다.';$('msg').className='err'}
  $('go').disabled=false;$('go').textContent='주둥이 털기'})();
