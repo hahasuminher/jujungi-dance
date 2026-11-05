@@ -84,3 +84,5 @@ body.in-plaza #plazaUi{display:block}
 body.in-club #clubExit{display:block}
 body.in-club .acts,body.in-club .reacts,body.in-club #pForm{opacity:.35;pointer-events:none}
 body.in-club #roomInfo{background:#0d0d0d;color:var(--neon-y)}
+.top-r{display:flex;gap:6px;pointer-events:auto}
+#zIn,#zOut{width:40px;height:40px;font-family:var(--stamp);font-size:24px;background:var(--paper);border:3px solid var(--ink);border-radius:50% 45% 50% 45%}
