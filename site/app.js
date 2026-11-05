@@ -13,7 +13,7 @@ function render(now){g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle='#fff';g.fillRe
  const bt=Dance.isBig()?Dance.bigBeat():0;const sh=!calm&&FX.shake();if(sh)g.translate(Math.sin(now/27)*7,Math.cos(now/21)*6);FX.back(g,bt);if(Plaza.isOn()){const e=Plaza.draw(g,W,Ht,now,tick,calm,burstHue,bt,Dance.isBig());FX.front(g,bt,e?Dance.eyes(W,Ht,e[0],e[1],e[2]):null,calm);return}Dance.render(g,W,Ht,S,ox,oy,tick,calm,burstHue);FX.front(g,bt,Dance.eyes(W,Ht,S,ox,oy),calm)}
 function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;
  if(play){const ms=play.clock();while(evI<events.length&&events[evI].ms<=ms)fire(events[evI++]);while(spI<specials.length&&specials[spI].ms<=ms){const sp=specials[spI++];if(Dance.big(sp.name))FX.start(sp.name,sp.word,W,Ht);if(!found.has(sp.word)){found.add(sp.word);store.set('jd.found',[...found]);showFound()}}if(ms>=play.total)finish()}
- Dance.update(dt,now);if(Plaza.isOn())Plaza.update(dt);if(FX.isOn()&&!Dance.isBig())FX.stop();FX.update(dt,W,Ht);if(Dance.isBig()&&Math.floor(Dance.bigBeat()/2)!==lastHalf){lastHalf=Math.floor(Dance.bigBeat()/2);burstHue=1-burstHue}burst+=(((play||Dance.isBig())?1:0)-burst)*.14;
+ Dance.update(dt,now);if(Plaza.isOn())Plaza.update(dt);if(clubLoop&&!Dance.isBig())Dance.big(['groove','combo','jackpot','bday','lotto','sixstep'][Math.floor(Math.random()*6)]);if(FX.isOn()&&!Dance.isBig())FX.stop();FX.update(dt,W,Ht);if(Dance.isBig()&&Math.floor(Dance.bigBeat()/2)!==lastHalf){lastHalf=Math.floor(Dance.bigBeat()/2);burstHue=1-burstHue}burst+=(((play||Dance.isBig())?1:0)-burst)*.14;
  tick=Math.floor(now/110);render(now);if(rec&&rec.mr)drawFrame();requestAnimationFrame(loop)}
 function fire(e){const j=$('jamo');j.textContent=e.j;if(!calm)j.style.transform=`rotate(${(Math.random()*26-13).toFixed(1)}deg) scale(${(.9+Math.random()*.25+e.ex*.05).toFixed(2)})`;Dance.event(e);
  if(e.idx!==subI){subI=e.idx;drawSub()}const t=performance.now();if(e.word!==lastWord&&t-lastBurst>340){lastBurst=t;lastWord=e.word;burstHue=1-burstHue}}
@@ -37,9 +37,12 @@ $('voiceSave').onclick=()=>{const list=store.get('jd.custom',[]),id='c'+Date.now
 /* 공유 */
 const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const dec=s=>JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/')))));
-let volume=1,extPlaying=false;
-function unlockAudio(){player.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAA=';player.play().catch(()=>{})}
-const App={speakText(raw,v,who){if(!engine)return false;if(play){finish()}extPlaying=true;speak(false,{raw,voice:v});if(!play){extPlaying=false;return false}return true},setSpeechVolume(v){volume=v;player.volume=v},resize(){setTimeout(size,30)}};
+let volume=1,extPlaying=false,clubLoop=false;
+function unlockAudio(){Sfx.unlock();player.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAA=';player.play().catch(()=>{})}
+const App={speakText(raw,v,who){if(!engine)return false;if(play){finish()}extPlaying=true;speak(false,{raw,voice:v});if(!play){extPlaying=false;return false}return true},setSpeechVolume(v){volume=v;player.volume=v},
+ surprise(name,word){if(!engine||play)return;subText='';subI=-1;const pcm=Beat.get(SR,16).subarray(0,Math.round(16*60/Beat.BPM*SR)),scaled=pcm.map(x=>x*.9);if(wavUrl)URL.revokeObjectURL(wavUrl);wavUrl=URL.createObjectURL(wav(scaled,SR));player.src=wavUrl;player.volume=volume;player.onended=finish;player.play().catch(()=>{});events=[];evI=0;specials=[{ms:0,name,word}];spI=0;play={clock:()=>player.currentTime*1000,total:8200};setBtn(true)},
+ clubStart(phrase,v,offsetMs,onEnd){stopAudio();const V={...VOICE_DEFAULT,...v},s=buildSpeech(phrase.replace(/[!?~]+/g,''),V),sr=SR,secs=60,mix=EDM.make(sr,secs),step=Math.round(60/EDM.BPM*8*sr);for(let t=sr*2;t<mix.length;t+=step){const n=Math.min(s.pcm.length,mix.length-t);for(let i=0;i<n;i++)mix[t+i]+=s.pcm[i]*.95}for(let i=0;i<mix.length;i++)mix[i]=Math.tanh(mix[i]*1.1)*.95;if(wavUrl)URL.revokeObjectURL(wavUrl);wavUrl=URL.createObjectURL(wav(mix,sr));clubLoop=true;player.src=wavUrl;player.volume=volume;player.onended=onEnd;const go=()=>{try{player.currentTime=offsetMs/1000}catch(e){}player.play().catch(()=>{})};if(player.readyState>=1)go();else player.onloadedmetadata=()=>{player.onloadedmetadata=null;go()};Dance.big('combo');FX.start('club',phrase,W,Ht)},
+ clubStop(){clubLoop=false;player.pause();player.onended=null;Dance.stop();FX.stop()},resize(){setTimeout(size,30)}};
 const SITE=location.origin+location.pathname;
 $('share').onclick=async()=>{if(navigator.share){try{await navigator.share({title:'주둥이 댄스',text:'아무 말이나 외치면 아저씨가 춤춘다',url:SITE});return}catch(e){if(e.name==='AbortError')return}}try{await navigator.clipboard.writeText(SITE);$('msg').textContent='사이트 주소를 복사했어요.'}catch(e){$('msg').textContent=SITE}};
 /* 영상 저장: 무대를 9:16 화면에 옮겨 그리며 녹화 */

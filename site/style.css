@@ -50,7 +50,7 @@ footer{color:var(--soft);font-size:15px;margin-top:8px}footer a{color:inherit}
 body.in-plaza{padding:0;overflow:hidden;height:100dvh;touch-action:none}
 body.in-plaza .wrap{max-width:none;display:block}
 body.in-plaza .wrap>*:not(#stage){display:none}
-body.in-plaza #stage{position:fixed;left:0;right:0;top:0;bottom:calc(136px + env(safe-area-inset-bottom,0px));height:auto;margin:0}
+body.in-plaza #stage{position:fixed;left:0;right:0;top:0;bottom:calc(186px + env(safe-area-inset-bottom,0px));height:auto;margin:0}
 body.in-plaza #stage h1,body.in-plaza #jamo,body.in-plaza #sub{display:none}
 body.in-plaza #cv{touch-action:none;cursor:grab}
 body.in-plaza #plazaUi{display:block}
@@ -63,7 +63,7 @@ body.in-plaza #plazaUi{display:block}
 #setMenu label{display:flex;gap:6px;align-items:center}#setMenu input{min-width:0;flex:1;accent-color:var(--neon-p)}
 #setMenu button,#peerMenu button{padding:6px 10px;font-weight:700;background:var(--neon-y);border:2px solid var(--ink);border-radius:10px}
 #peerMenu{width:170px}
-#pMsg{position:fixed;left:12px;right:12px;bottom:calc(146px + env(safe-area-inset-bottom,0px));text-align:center;font-weight:700;pointer-events:none}
+#pMsg{position:fixed;left:12px;right:12px;bottom:calc(196px + env(safe-area-inset-bottom,0px));text-align:center;font-weight:700;pointer-events:none}
 #pMsg:not(:empty){color:var(--ink)}
 #dock{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:8px;padding:10px max(12px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));background:var(--paper);border-top:3px solid var(--ink)}
 .reacts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
@@ -72,3 +72,15 @@ body.in-plaza #plazaUi{display:block}
 #pIn{flex:1;min-width:0;min-height:54px;padding:6px 12px;font:inherit;font-size:20px;font-weight:700;border:3px solid var(--ink);border-radius:18px 6px 18px 6px;outline:none}
 #pIn:focus-visible{box-shadow:0 0 0 3px var(--neon-y)}
 #pForm button{min-width:96px;font-family:var(--stamp);font-size:21px;background:var(--neon-p);border:3px solid var(--ink);border-radius:6px 18px 6px 18px}
+.acts{display:flex;gap:4px}
+.acts button{flex:1 1 0;min-width:0;min-height:38px;padding:0 2px;font-size:16px;font-weight:700;background:var(--paper);border:2px solid var(--ink);border-radius:5px 12px 5px 12px;white-space:nowrap}
+.acts button[aria-pressed="true"]{background:var(--ink);color:var(--neon-y)}
+#aClub{background:var(--neon-p)}
+.pop{position:fixed;z-index:6;left:50%;top:22%;transform:translateX(-50%);width:min(320px,calc(100vw - 32px));display:flex;flex-direction:column;gap:8px;padding:14px;background:var(--paper);border:3px solid var(--ink);border-radius:20px 7px 20px 7px;box-shadow:5px 6px 0 var(--ink);font-weight:700}
+.pop[hidden]{display:none}.pop strong{font-family:var(--stamp);font-size:22px;font-weight:400}.pop span{overflow-wrap:anywhere}
+.pop input{min-width:0;padding:8px 10px;font:inherit;font-weight:700;border:3px solid var(--ink);border-radius:10px}
+.pop-row{display:flex;gap:8px}.pop-row button{flex:1;min-height:44px;font-weight:700;background:var(--neon-y);border:2px solid var(--ink);border-radius:10px}
+#clubExit{display:none;position:fixed;z-index:5;left:50%;top:calc(58px + env(safe-area-inset-top,0px));transform:translateX(-50%);padding:6px 14px;font-weight:700;background:var(--neon-p);border:3px solid var(--ink);border-radius:18px 7px 18px 7px}
+body.in-club #clubExit{display:block}
+body.in-club .acts,body.in-club .reacts,body.in-club #pForm{opacity:.35;pointer-events:none}
+body.in-club #roomInfo{background:#0d0d0d;color:var(--neon-y)}
