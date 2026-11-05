@@ -1,0 +1,26 @@
+/* 마이크 노래방: 저작권이 끝난 멜로디와 자작곡. 가사를 한 음절씩 음에 맞춰 부른다 */
+const NT={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+const parseSong=s=>s.trim().split(/\s+/).map(t=>{const[n,b]=t.split(':'),q=+b||1;if(n==='R')return{m:0,b:q};const sh=n.includes('#')?1:0;return{m:12*(+n.at(-1)+1)+NT[n[0]]+sh,b:q}});
+const SONGS=[
+ {id:'star',nm:'작은 별',by:'프랑스 옛 멜로디',bpm:112,bar:4,lyr:'반짝반짝 작은 주둥이 아름답게 비추네 동쪽 하늘에서도 서쪽 하늘에서도 반짝반짝 작은 주둥이 아름답게 비추네',ch:'C F C C F C G C C F G G C F G G C F C C F C G C',n:'C4 C4 G4 G4 A4 A4 G4:2 F4 F4 E4 E4 D4 D4 C4:2 G4 G4 F4 F4 E4 E4 D4:2 G4 G4 F4 F4 E4 E4 D4:2 C4 C4 G4 G4 A4 A4 G4:2 F4 F4 E4 E4 D4 D4 C4:2'},
+ {id:'lamb',nm:'메리의 어린 양',by:'19세기 미국 옛 노래',bpm:120,bar:4,lyr:'주둥이가 주둥이가 춤을 춘다 춤을 춘다 주둥이가 주둥이가 쉬지 않고 춘다',ch:'C C G C C C G C',n:'E4:1.5 D4:.5 C4 D4 E4 E4 E4:2 D4 D4 D4:2 E4 G4 G4:2 E4:1.5 D4:.5 C4 D4 E4 E4 E4 E4 D4 D4 E4 D4 C4:4'},
+ {id:'bell',nm:'징글벨',by:'피어폰트, 1857',bpm:138,bar:4,lyr:'주둥이 주둥이 주둥이 댄스 오늘도 춤을 춘다 주둥이 주둥이 주둥이 댄스 내일도 춤을 춘다',ch:'C C C C F C D G C C C C F C G C',n:'E4 E4 E4:2 E4 E4 E4:2 E4 G4 C4:1.5 D4:.5 E4:4 F4 F4 F4:1.5 F4:.5 F4 E4 E4 E4:.5 E4:.5 E4 D4 D4 E4 D4:2 G4:2 E4 E4 E4:2 E4 E4 E4:2 E4 G4 C4:1.5 D4:.5 E4:4 F4 F4 F4:1.5 F4:.5 F4 E4 E4 E4:.5 E4:.5 G4 G4 F4 D4 C4:4'},
+ {id:'joy',nm:'환희의 송가',by:'베토벤',bpm:116,bar:4,lyr:'주둥이를 털어 보자 다 함께 털어 보자 퇴근하고 털어 보자 다 같이 털어 보자',ch:'C G C G C G C G',n:'E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 E4:1.5 D4:.5 D4:2 E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4:1.5 C4:.5 C4:2'},
+ {id:'can',nm:'캉캉',by:'오펜바흐',bpm:150,bar:2,lyr:'주둥이 주둥이 주둥이 주둥이 다리를 들어라 다리를 들어라 주둥이 주둥이 주둥이 주둥이 춤춘다',ch:'C C G C C G G C C C G C C G G C',n:'C4:2 C4:.5 D4:.5 F4:.5 E4:.5 D4 G4 G4 G4:.5 A4:.5 E4:.5 F4:.5 D4 D4 D4:.5 F4:.5 E4:.5 D4:.5 C4 C5 B4:.5 A4:.5 G4:.5 F4:.5 E4:.5 D4:.5 C4:2'},
+ {id:'trot',nm:'주둥이 트로트',by:'주둥이 댄스 자작곡',bpm:126,bar:4,lyr:'내 주둥이 어디 갔나 찾아봐도 없네 오늘도 혼자 털고 간다 주둥이 인생',ch:'Am Dm E Am Am Dm E Am',n:'A4 C5:.5 D5:.5 E5:1.5 D5:.5 C5 D5:.5 C5:.5 A4:2 D5 F5:.5 E5:.5 D5:1.5 C5:.5 B4 C5:.5 D5:.5 E5:2 E5:.5 G5:.5 A5 G5:.5 E5:.5 D5 C5 D5:.5 E5:.5 D5:2 E5 D5:.5 C5:.5 B4:1.5 C5:.5 A4:3 R:1'}];
+const songInfo=id=>{const S=SONGS.find(x=>x.id===id)||SONGS[0],N=parseSong(S.n),beats=N.reduce((a,x)=>a+x.b,0);return{S,N,beats}};
+const songSecs=(id,n)=>{const{S,N,beats}=songInfo(id),sl=N.filter(x=>x.m).length;return Math.min(3,Math.max(1,Math.ceil(n/sl)))*beats*60/S.bpm+1};
+function f0Of(p,len){const a=Math.floor(len*.35),n=Math.min(1500,len-a),lo=Math.floor(SR/900),hi=Math.floor(SR/90);const c=[];let bv=0;for(let l=lo;l<hi&&l<n;l++){let s=0;for(let i=0;i<n-l;i+=2)s+=p[a+i]*p[a+i+l];c[l]=s;bv=Math.max(bv,s)}for(let l=lo+1;l<c.length-1;l++)if(c[l]>=bv*.82&&c[l]>=c[l-1]&&c[l]>=c[l+1])return l;return lo}
+function psola(src,len,T0,freq,dur,seed){const L=Math.floor(dur*SR),o=new Float32Array(L+T0*2),cons=Math.floor(len*.3),a=cons,b=Math.max(a+T0*2,Math.floor(len*.85));let t=0,k=0,rate=1;const det=(((seed*7919)%13)/13-.5)*.05;
+ while(t<L){const sec=t/SR,vib=sec>.16?.022*Math.sin(sec*33):0,T1=SR/(freq*2**(det+vib));let c=t<cons?t:a+Math.abs(((t-cons)*.55)%(2*(b-a))-(b-a));c=Math.round(c/T0)*T0;
+  for(let j=-T0;j<T0;j++){const q=t+j,w=.5+.5*Math.cos(Math.PI*j/T0),v=src[Math.min(len-1,Math.max(0,c+j))];if(q>=0&&q<L)o[q]+=v*w}
+  t+=Math.max(8,Math.round(T1));k++}
+ const fo=Math.min(L,Math.floor(SR*.05));for(let i=0;i<fo;i++)o[L-1-i]*=i/fo;for(let i=0,n=Math.floor(SR*.004);i<n;i++)o[i]*=i/n;return o.subarray(0,L)}
+function singSong(raw,id,v){const{S,N,beats}=songInfo(id),syl=[...toSpoken(raw).spoken].filter(c=>/[가-힣]/.test(c));if(!syl.length)return{text:'',pcm:null};
+ const voiced=N.filter(x=>x.m).length,rep=Math.min(3,Math.max(1,Math.ceil(syl.length/voiced))),B=60/S.bpm,lead=1.2,total=rep*beats*B+lead+.8,mix=EDM.band(SR,S,rep*beats,lead,total),cache={},events=[];
+ const vp={...v,range:Math.min(v.range,18),rate:Math.max(120,v.rate*.8)};let voiceF=0;
+ const grab=c=>{if(cache[c])return cache[c];const p=synthSeg(c,{ex:0,dots:false},vp),r=Math.max(1,v.speed||1),len=Math.floor(p.len/r),o=new Float32Array(len);for(let i=0;i<len;i++){const q=i*r,k=q|0,e=q-k;o[i]=p.pcm[k]+((p.pcm[k+1]||0)-p.pcm[k])*e}const T0=f0Of(o,len);return cache[c]={pcm:o,len,T0}};
+ {const p=grab(syl[0]);voiceF=SR/p.T0}
+ const mean=N.filter(x=>x.m).reduce((a,x)=>a+x.m,0)/voiced,meanF=440*2**((mean-69)/12),oct=Math.round(Math.log2(voiceF/meanF)+.6);let beat=0,si=0;
+ for(let r=0;r<rep;r++)for(const x of N){if(x.m){const c=syl[si%syl.length],p=grab(c),st=lead+beat*B,dur=x.b*B*.94,freq=440*2**((x.m+oct*12-69)/12),g=psola(p.pcm,p.len,p.T0,freq,Math.min(dur,1.2),si),o=Math.floor(st*SR);let pk=0;for(let i=0;i<g.length;i++)pk=Math.max(pk,Math.abs(g[i]));const k=.82/(pk||1);for(let i=0;i<g.length&&o+i<mix.length;i++)mix[o+i]+=g[i]*k;const d=decompose(c);if(d)d.forEach((j,q)=>events.push({...j,idx:si%syl.length,word:0,ex:0,q:0,til:0,dots:false,ms:st*1000+q*60}));si++}beat+=x.b}
+ for(let i=0;i<mix.length;i++)mix[i]=Math.tanh(mix[i]*1.05)*.95;return{pcm:mix,events,text:syl.join(''),skipped:0,totalMs:mix.length/SR*1000,specials:[]}}

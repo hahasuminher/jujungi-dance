@@ -32,7 +32,7 @@ const EDM=(()=>{const BPMS={edm:128,hiphop:88,disco:118,trot:126},cache={},TAU=M
    const hat=((b*2)%1<.08?1:0)*(Math.random()*2-1)*.14,clap=(Math.floor(b)%2===1&&bb<.12)?(Math.random()*2-1)*Math.exp(-bb*30)*.32:0;
    const sweep=bar===3?Math.sin(2*Math.PI*t*(600+900*((b%4)/4)))*.06*((b%4)/4):0;
    x[i]=Math.tanh(ks*.95+bass+lp*.55+hat+clap+sweep)}return x}
- function kit(sr,bpm){const B=60/bpm,N=Math.round(B*32*sr),x=new Float32Array(N),add=(at,dur,fn)=>{const i0=Math.round(at*sr),n=Math.round(dur*sr);for(let i=0;i<n;i++)x[(i0+i)%N]+=fn(i/sr)*Math.min(1,(dur-i/sr)*60)};
+ function kit(sr,bpm,beats=32){const B=60/bpm,N=Math.round(B*beats*sr),x=new Float32Array(N),add=(at,dur,fn)=>{const i0=Math.round(at*sr),n=Math.round(dur*sr);for(let i=0;i<n;i++)x[(i0+i)%N]+=fn(i/sr)*Math.min(1,(dur-i/sr)*60)};
   return{B,N,x,add,kick:(at,f=48,g=.95)=>add(at,.3,t=>Math.sin(TAU*(f*t+(130/26)*(1-Math.exp(-t*26))))*Math.exp(-t*12)*g),
    snare:(at,g=.42)=>add(at,.2,t=>((Math.random()*2-1)*.8+Math.sin(TAU*190*t)*.6)*Math.exp(-t*17)*g),
    hat:(at,g=.13,d=70)=>{let l=0;add(at,.1+14/d,t=>{const r=Math.random()*2-1,h=r-l;l=r;return h*Math.exp(-t*d)*g})},
@@ -55,10 +55,16 @@ const EDM=(()=>{const BPMS={edm:128,hiphop:88,disco:118,trot:126},cache={},TAU=M
    for(const st of[1,3])for(const n of ch)k.tone((o+st)*B,.17,mf(n),.075,org)}
   for(const[st,n,l]of M)k.tone(st*B,l*B*.92,mf(n),.26,org);
   return k.finish()}
+ const CHORD={C:[60,64,67],F:[60,65,69],G:[59,62,67],Am:[60,64,69],Dm:[62,65,69],E:[59,64,68],D:[62,66,69]},org=(t,f)=>{const v=1+.005*Math.sin(TAU*5.6*t),p=t*f*v;return(2*(p%1)-1)*.42+(((p*2)%1)<.5?.26:-.26)};
+ function band(sr,S,beats,lead,total){const k=kit(sr,S.bpm,beats+8),{B}=k,o=new Float32Array(Math.round(total*sr)),ch=S.ch.split(' '),L=lead/B;
+  for(let i=0;i<4;i++){k.hat((L-4+i)*B>0?(L-4+i)*B:0,.14,40)}
+  for(let b=0;b<beats;b++){const bar=Math.floor(b/S.bar),c=ch[bar%ch.length],pos=(L+b)*B,st=b%S.bar,cd=CHORD[c]||CHORD.C,root=cd[0]-24+(c==='Am'?9:c==='F'?5:c==='G'?-1:c==='Dm'?0:0);
+   if(st%2===0){k.kick(pos,56,.7);k.tone(pos,B*.8,mf(root+(st?7:0)),.3,(t,f)=>Math.sin(TAU*f*t)*Math.exp(-t*3))}else{k.snare(pos,.22);for(const n of cd)k.tone(pos,.16,mf(n),.05,org)}k.hat(pos+B/2,.08,60)}
+  for(let i=0;i<o.length&&i<k.x.length;i++)o[i]=k.x[i]*.6;return o}
  const MK={edm:edmBars,hiphop:hiphopBars,disco:discoBars,trot:trotBars};
- return{bpm:t=>BPMS[t]||128,make(sr,secs,t='edm'){if(!MK[t])t='edm';const c=cache[t]||(cache[t]=MK[t](sr)),N=Math.round(secs*sr),o=new Float32Array(N);for(let i=0;i<N;i++)o[i]=c[i%c.length]*.72;return o}}})();
+ return{band,bpm:t=>BPMS[t]||128,make(sr,secs,t='edm'){if(!MK[t])t='edm';const c=cache[t]||(cache[t]=MK[t](sr)),N=Math.round(secs*sr),o=new Float32Array(N);for(let i=0;i<N;i++)o[i]=c[i%c.length]*.72;return o}}})();
 /* 박치기 효과음 */
 const Sfx=(()=>{const sr=22050,mk=(dur,fn)=>{const n=Math.round(dur*sr),o=new Float32Array(n);for(let i=0;i<n;i++)o[i]=fn(i/sr)*Math.min(1,(dur-i/sr)*40);return o};
- const SND={'깡!':()=>{let y=0;return mk(.55,t=>{y+=.5*((Math.random()*2-1)-y);return y*2.2*Math.exp(-t*70)+(Math.sin(2*Math.PI*1760*t)*.5+Math.sin(2*Math.PI*2640*t)*.35+Math.sin(2*Math.PI*3970*t)*.2)*Math.exp(-t*9)})},'빡!':()=>{let y=0;return mk(.14,t=>{y+=.6*((Math.random()*2-1)-y);return(y*3+Math.sin(2*Math.PI*620*t)*.7)*Math.exp(-t*34)})},'삐융!':()=>{let p=0;return mk(.7,t=>{p+=(2100-1500*t/.7+60*Math.sin(t*60))/sr;return Math.sin(2*Math.PI*p)*.75*Math.min(1,t*30)})},'퍽!':()=>{let y=0;return mk(.16,t=>{y+=.3*((Math.random()*2-1)-y);return(y*2.4+Math.sin(2*Math.PI*150*t)*.8)*Math.exp(-t*26)})},'쿵!':()=>mk(.34,t=>Math.sin(2*Math.PI*(44+90*Math.exp(-t*20))*t)*Math.exp(-t*9)*1.1),'뽁!':()=>mk(.13,t=>Math.sin(2*Math.PI*(260+1500*t*t*40)*t)*Math.exp(-t*24))};
+ const SND={'뿅!':()=>{let p=0;return mk(.28,t=>{p+=(t<.1?900+6200*t:1520+2400*(t-.1))/sr;const v=Math.sin(2*Math.PI*p);return(v>0?.8:-.8)*.55*Math.exp(-t*7)+Math.sin(2*Math.PI*p*2)*.25*Math.exp(-t*9)})},'깡!':()=>{let y=0;return mk(.55,t=>{y+=.5*((Math.random()*2-1)-y);return y*2.2*Math.exp(-t*70)+(Math.sin(2*Math.PI*1760*t)*.5+Math.sin(2*Math.PI*2640*t)*.35+Math.sin(2*Math.PI*3970*t)*.2)*Math.exp(-t*9)})},'빡!':()=>{let y=0;return mk(.14,t=>{y+=.6*((Math.random()*2-1)-y);return(y*3+Math.sin(2*Math.PI*620*t)*.7)*Math.exp(-t*34)})},'삐융!':()=>{let p=0;return mk(.7,t=>{p+=(2100-1500*t/.7+60*Math.sin(t*60))/sr;return Math.sin(2*Math.PI*p)*.75*Math.min(1,t*30)})},'퍽!':()=>{let y=0;return mk(.16,t=>{y+=.3*((Math.random()*2-1)-y);return(y*2.4+Math.sin(2*Math.PI*150*t)*.8)*Math.exp(-t*26)})},'쿵!':()=>mk(.34,t=>Math.sin(2*Math.PI*(44+90*Math.exp(-t*20))*t)*Math.exp(-t*9)*1.1),'뽁!':()=>mk(.13,t=>Math.sin(2*Math.PI*(260+1500*t*t*40)*t)*Math.exp(-t*24))};
  const urls={},el=new Audio();el.preload='auto';el.setAttribute('playsinline','');
- return{unlock(){if(!Object.keys(urls).length){for(const k in SND)urls[k]=URL.createObjectURL(wav(SND[k](),sr));try{if(engine){const s=buildSpeech('아야',VOICE_DEFAULT);urls['아야!']=URL.createObjectURL(wav(s.pcm,SR))}}catch(e){}}el.src=urls['쿵!'];el.volume=0;el.play().catch(()=>{})},play(k,v){if(!urls[k])return;el.pause();el.src=urls[k];el.volume=Math.max(0,Math.min(1,v));el.play().catch(()=>{})}}})();
+ return{unlock(){if(!Object.keys(urls).length){for(const k in SND)urls[k]=URL.createObjectURL(wav(SND[k](),sr));try{if(engine){const s=buildSpeech('아야',VOICE_DEFAULT);urls['아야!']=URL.createObjectURL(wav(s.pcm,SR))}}catch(e){}}el.src=SILENT;el.play().catch(()=>{})},play(k,v){if(!urls[k])return;el.pause();el.src=urls[k];el.volume=Math.max(0,Math.min(1,v));el.play().catch(()=>{})}}})();

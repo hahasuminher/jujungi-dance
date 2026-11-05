@@ -1,7 +1,8 @@
 /* 손그림 도구: 도형의 선을 울퉁불퉁하게 만들고 시간에 따라 살짝 찌글거리게 한다 */
-const Rough=(()=>{const tick=()=>Math.floor(performance.now()/120),n=(i,s)=>Math.sin(i*1.9+s*1.3)*.6+Math.sin(i*.73+s*2.7)*.4;
+const WOBBLE=.55;
+const Rough=(()=>{const tick=()=>Math.floor(performance.now()/170),n=(i,s)=>Math.sin(i*1.9+s*1.3)*.6+Math.sin(i*.73+s*2.7)*.4;
  function pts(P,close,amp,seed){const o=[],L=P.length,E=close?L:L-1;let k=0;for(let i=0;i<E;i++){const a=P[i],b=P[(i+1)%L],d=Math.hypot(b[0]-a[0],b[1]-a[1]),m=Math.max(1,Math.round(d/7)),nx=(a[1]-b[1])/(d||1),ny=(b[0]-a[0])/(d||1);for(let j=0;j<m;j++){const t=j/m,w=n(k++,seed)*amp;o.push([a[0]+(b[0]-a[0])*t+nx*w,a[1]+(b[1]-a[1])*t+ny*w])}}if(!close)o.push(P[L-1]);return o}
- function poly(g,P,o={}){const{fill=null,stroke='#0d0d0d',lw=2.6,amp=1.15,seed=0,close=true}=o,q=pts(P,close,amp,seed+tick()*2.1);g.beginPath();q.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));if(close)g.closePath();if(fill){g.fillStyle=fill;g.fill()}if(stroke&&lw){g.strokeStyle=stroke;g.lineWidth=lw;g.lineJoin=g.lineCap='round';g.stroke()}}
+ function poly(g,P,o={}){const{fill=null,stroke='#0d0d0d',lw=2.6,amp=1.15,seed=0,close=true}=o,q=pts(P,close,amp*WOBBLE,seed+tick()*2.1);g.beginPath();q.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));if(close)g.closePath();if(fill){g.fillStyle=fill;g.fill()}if(stroke&&lw){g.strokeStyle=stroke;g.lineWidth=lw;g.lineJoin=g.lineCap='round';g.stroke()}}
  const ell=(x,y,rx,ry,c=14)=>Array.from({length:c},(_,i)=>[x+Math.cos(i/c*6.283)*rx,y+Math.sin(i/c*6.283)*ry]);
  return{poly,ell,line:(g,P,o={})=>poly(g,P,{...o,close:false})}})();
 /* 스페셜 연출: 꽃가루, 레이저, 조명, 큰 글씨 */

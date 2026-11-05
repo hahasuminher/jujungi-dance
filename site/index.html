@@ -41,16 +41,18 @@
 </div>
 <div id="plazaUi">
   <div id="plazaTop"><strong id="roomInfo"></strong><span class="top-r"><button id="zOut" type="button" aria-label="축소">-</button><button id="zIn" type="button" aria-label="확대">+</button><button id="setBtn" type="button">설정</button></span></div>
-  <div id="setMenu" hidden><button id="beep" type="button" aria-pressed="true">욕 삐 처리 켬</button><label for="volume">볼륨<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label><strong>목소리</strong><div id="pVoices" class="chips"></div><button id="leave" type="button">광장 나가기</button></div>
+  <div id="setMenu" hidden><button id="beep" type="button" aria-pressed="true">욕 삐 처리 켬</button><button id="allHear" type="button" aria-pressed="false">전체 듣기 끔</button><label for="volume">볼륨<input id="volume" type="range" min="0" max="1" step="0.01" value="1"></label><small id="pLag"></small><strong>목소리</strong><div id="pVoices" class="chips"></div><button id="leave" type="button">광장 나가기</button></div>
   <div id="peerMenu" hidden><strong id="peerName"></strong><button id="peerMute" type="button">음소거</button><button id="peerReport" type="button">신고</button></div>
   <div id="pMsg" role="status"></div>
   <div id="clubOpen" class="pop" hidden><strong>주둥이 클럽 열기</strong><label for="clubIn">클럽에서 반복할 말</label><input id="clubIn" maxlength="30" placeholder="30자까지, 비속어 금지" autocomplete="off"><div id="clubThemes" class="chips"><button class="chip" type="button" data-t="edm" aria-pressed="true">EDM</button><button class="chip" type="button" data-t="hiphop" aria-pressed="false">힙합</button><button class="chip" type="button" data-t="disco" aria-pressed="false">디스코</button><button class="chip" type="button" data-t="trot" aria-pressed="false">트로트</button></div><div class="pop-row"><button id="clubGo" type="button">초대 보내기</button><button id="clubCancel" type="button">닫기</button></div></div>
   <div id="clubInvite" class="pop" hidden><strong>클럽 초대장</strong><span id="clubText"></span><div class="pop-row"><button id="clubYes" type="button">입장</button><button id="clubNo" type="button">거절</button></div></div>
   <button id="clubExit" type="button">클럽 나가기</button>
+  <button id="aSing" type="button" hidden>노래하기</button>
   <button id="aPick" type="button" hidden></button>
+  <div id="singOpen" class="pop" hidden><strong>주둥이 노래방</strong><div id="singSongs" class="chips"></div><small id="singBy"></small><label for="singIn">가사 (비워 두면 기본 가사)</label><textarea id="singIn" maxlength="120" rows="3"></textarea><div class="pop-row"><button id="singGo" type="button">노래 시작</button><button id="singCancel" type="button">닫기</button></div></div>
   <div id="dock"><div class="reacts"><button type="button" data-react="ㅋㅋㅋ">ㅋㅋㅋ</button><button type="button" data-react="박수">박수</button><button type="button" data-react="야유">야유</button><button type="button" data-react="하트">하트</button></div>
    <div class="acts"><button id="aSit" type="button" aria-pressed="false">앉기</button><button id="aLie" type="button" aria-pressed="false">눕기</button><button id="aRide" type="button" aria-pressed="false">업히기</button><button id="aTrain" type="button" aria-pressed="false">기차</button><button id="aBanana" type="button">바나나</button><button id="aClub" type="button">클럽</button></div>
-   <form id="pForm"><input id="pIn" maxlength="120" placeholder="광장에 외칠 말" autocomplete="off" aria-label="광장에 외칠 말"><button type="submit">외치기</button></form></div>
+   <form id="pForm"><input id="pIn" maxlength="120" enterkeyhint="send" placeholder="광장에 외칠 말" autocomplete="off" aria-label="광장에 외칠 말"><button type="submit">외치기</button></form></div>
 </div>
 <script src="boot.js"></script>
 </body>

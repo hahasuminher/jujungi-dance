@@ -48,7 +48,7 @@ const wob=(i,seed)=>{const f=i/9,k=f|0,e=f-k,u=e*e*(3-2*e),a=noise[(k+seed)&4095
 
 function drawChar(ctx,P,ox,oy,S,o){
   o=o||{};
-  const j=o.boil||0,lw=Math.max(2.2,7*S*.95),stroke=o.stroke||'#0d0d0d',fill=o.fill===undefined?'#fff':o.fill;
+  const j=(o.boil||0)*WOBBLE,lw=Math.max(2.2,7*S*.95),stroke=o.stroke||'#0d0d0d',fill=o.fill===undefined?'#fff':o.fill;
   const hh=H*.3;
   const T=(x,y)=>{const v=(y-CY)/hh;return[x+P.bd*v*v*hh*.55+P.tw*v*hh*.5,y]};
   const curves={};
@@ -92,7 +92,9 @@ function drawChar(ctx,P,ox,oy,S,o){
   ctx.closePath();ctx.restore();stk();
   ctx.save();root();head();ctx.fillStyle=stroke;
   const m=o.mouth||0,feats=CHAR.feats;
+  if(o.xeye){ctx.strokeStyle=stroke;ctx.lineWidth=17;ctx.lineCap='round';for(const x of[1096,1264]){ctx.beginPath();ctx.moveTo(x-46,478);ctx.lineTo(x+46,526);ctx.moveTo(x+46,478);ctx.lineTo(x-46,526);ctx.stroke()}}
   for(const f of feats){
+    if(o.xeye&&f.cy<530)continue;
     const low=f===LOWER,dy=low?m*46:0;
     if(low&&m>.08){const u=UPPER;ctx.beginPath();ctx.ellipse(u.cx,(u.cy+f.cy+dy)/2,44,Math.max(3,(f.cy+dy-u.cy)/2),0,0,7);ctx.fill()}
     ctx.beginPath();f.pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]+dy):ctx.moveTo(p[0],p[1]+dy));ctx.closePath();ctx.fill();
