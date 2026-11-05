@@ -1,0 +1,22 @@
+/* 스페셜 연출: 꽃가루, 레이저, 조명, 큰 글씨 */
+const FX=(()=>{let parts=[],on=false,kinds=[],word='',t=0,W=0,Ht=0;const C=['#ff2bb3','#f4ff1f','#2b6cff','#21c35a','#ff7a1a','#fff'],R=(a,b)=>a+Math.random()*(b-a);
+ const SET={run:['confetti','speed','lights'],melt:['bubble','lights'],love:['heart','laser','confetti'],chicken:['feather','confetti','lights'],lotto:['coin','confetti','lights','laser'],sink:['bubble','laser'],zombie:['laser','lights'],bigmouth:['laser','star','confetti'],headspin:['confetti','lights','star'],windmill:['confetti','lights','speed'],sixstep:['star','lights','confetti'],combo:['confetti','laser','lights','star'],groove:['confetti','heart','laser','lights']};
+ const has=k=>kinds.includes(k);
+ function spawn(kind){const p={k:kind,x:R(0,W),y:-20,vx:R(-30,30),vy:R(90,230),r:R(0,6.3),vr:R(-7,7),s:R(5,11),c:C[Math.floor(R(0,6))]};
+  if(kind==='bubble'){p.y=Ht+20;p.vy=-R(70,160);p.s=R(8,20)}
+  if(kind==='star'){const a=R(0,6.3),v=R(180,420);p.x=W/2;p.y=Ht*.5;p.vx=Math.cos(a)*v;p.vy=Math.sin(a)*v;p.s=R(9,18);p.life=1.1}
+  if(kind==='speed'){p.y=R(0,Ht);p.x=W+40;p.vx=-R(900,1500);p.vy=0;p.s=R(60,160)}
+  if(kind==='coin')p.s=R(9,13);if(kind==='heart')p.s=R(11,20);if(kind==='feather'){p.s=R(9,15);p.vy=R(50,110)}parts.push(p)}
+ return{start(name,w,wi,hi){kinds=SET[name]||['confetti'];word=w;on=true;t=0;W=wi;Ht=hi},stop(){on=false},isOn:()=>on,
+  update(dt,wi,hi){W=wi;Ht=hi;if(on){t+=dt;const rate=parts.length<260?1:0;for(const k of['confetti','heart','coin','feather','bubble','star','speed'])if(has(k)){const n=(k==='confetti'?70:k==='star'?22:k==='speed'?30:16)*dt*rate;for(let i=0;i<Math.floor(n)+(Math.random()<n%1?1:0);i++)spawn(k)}}
+   for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.r+=p.vr*dt;if(p.k==='confetti'||p.k==='feather')p.vx+=Math.sin(p.y/40)*30*dt;if(p.life!==undefined)p.life-=dt}
+   parts=parts.filter(p=>p.y<Ht+40&&p.y>-60&&p.x>-200&&p.x<W+200&&(p.life===undefined||p.life>0))},
+  back(g,beat){if(!on||!has('lights'))return;const n=4;g.save();g.globalAlpha=.33;for(let i=0;i<n;i++){const x=W*(i+.5)/n,a=Math.PI/2+Math.sin(beat*Math.PI/2+i*1.6)*.7,len=Ht*1.4,sp=.16;g.beginPath();g.moveTo(x,-10);g.lineTo(x+Math.cos(a-sp)*len,Math.sin(a-sp)*len);g.lineTo(x+Math.cos(a+sp)*len,Math.sin(a+sp)*len);g.closePath();g.fillStyle=C[(i+Math.floor(beat/2))%5];g.fill()}g.restore()},
+  front(g,beat,eyes,calm){if(on&&has('laser')&&eyes){const sweep=Math.sin(beat*Math.PI/2);eyes.forEach((e,i)=>{const a=(i?.45:Math.PI-.45)+sweep*(i?.75:-.75),L=Math.max(W,Ht)*1.3,x=e[0]+Math.cos(a)*L,y=e[1]+Math.sin(a)*L;g.save();g.lineCap='round';g.strokeStyle='#ff2b2b';g.lineWidth=11;g.globalAlpha=.75;g.beginPath();g.moveTo(e[0],e[1]);g.lineTo(x,y);g.stroke();g.globalAlpha=1;g.strokeStyle='#fff';g.lineWidth=3.5;g.stroke();g.fillStyle='#fff';g.beginPath();g.arc(e[0],e[1],7+3*Math.abs(sweep),0,7);g.fill();g.restore()})}
+   for(const p of parts){g.save();g.translate(p.x,p.y);if(p.k!=='speed')g.rotate(p.r);g.fillStyle=p.c;if(p.k==='confetti')g.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);else if(p.k==='heart'){g.fillStyle='#ff2bb3';const s=p.s;g.beginPath();g.moveTo(0,s*.7);g.bezierCurveTo(-s*1.2,-s*.1,-s*.5,-s,0,-s*.3);g.bezierCurveTo(s*.5,-s,s*1.2,-s*.1,0,s*.7);g.fill();g.strokeStyle='#0d0d0d';g.lineWidth=1.5;g.stroke()}
+    else if(p.k==='coin'){g.scale(Math.abs(Math.cos(p.r))+.15,1);g.fillStyle='#ffd21f';g.beginPath();g.arc(0,0,p.s,0,7);g.fill();g.strokeStyle='#0d0d0d';g.lineWidth=2;g.stroke()}
+    else if(p.k==='feather'){g.fillStyle='#fff';g.strokeStyle='#0d0d0d';g.lineWidth=1.5;g.beginPath();g.ellipse(0,0,p.s*.5,p.s*1.2,0,0,7);g.fill();g.stroke()}
+    else if(p.k==='bubble'){g.strokeStyle='#2b6cff';g.fillStyle='rgba(255,255,255,.5)';g.lineWidth=2;g.beginPath();g.arc(0,0,p.s,0,7);g.fill();g.stroke()}
+    else if(p.k==='star'){g.fillStyle='#f4ff1f';g.strokeStyle='#0d0d0d';g.lineWidth=2;g.beginPath();for(let i=0;i<10;i++){const r=i%2?p.s*.45:p.s,a=i*Math.PI/5;g.lineTo(Math.cos(a)*r,Math.sin(a)*r)}g.closePath();g.fill();g.stroke()}
+    else if(p.k==='speed'){g.fillStyle='#0d0d0d';g.fillRect(0,0,p.s,2.5)}g.restore()}
+   if(on&&word){const pop=1+.16*Math.max(0,1-(beat%1)*3),fs=Math.min(W*.16,92);g.save();g.translate(W/2,Ht*.84);g.rotate(calm?0:Math.sin(beat*Math.PI/2)*.05);g.scale(pop,pop);g.font=`900 ${fs}px "Black Han Sans","Noto Sans CJK KR",sans-serif`;g.textAlign='center';g.textBaseline='middle';g.lineWidth=fs*.14;g.strokeStyle='#0d0d0d';g.lineJoin='round';g.strokeText(word+'!!!',0,0);g.fillStyle=Math.floor(beat)%2?'#f4ff1f':'#ff2bb3';g.fillText(word+'!!!',0,0);g.restore()}}}})();

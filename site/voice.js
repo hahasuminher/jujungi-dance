@@ -61,5 +61,7 @@ function buildSpeech(raw,v){
   for(const[word,name]of Object.entries(SPECIALS))if(seg.raw.includes(word))specials.push({ms:t,word,name});
   parts.push(out);t+=out.length/SR*1000;const gap=seg.dots?.28:.09;parts.push(new Float32Array(Math.round(gap*SR)));t+=gap*1000}
  const n=parts.reduce((a,p)=>a+p.length,0),pcm=new Float32Array(n);let o=0;for(const p of parts){pcm.set(p,o);o+=p.length}
- for(let i=0;i<n;i++)pcm[i]=Math.tanh(pcm[i]*1.05)*.92; // 귀를 보호하는 상한
- events.sort((a,b)=>a.ms-b.ms);return{pcm,events,text,skipped,totalMs:n/SR*1000,specials}}
+ events.sort((a,b)=>a.ms-b.ms);let mix=pcm;
+ if(specials.length){const sp=specials[0];specials.length=1;const beat=Beat.get(SR,16),st=Math.round(sp.ms/1000*SR),L=Math.round(16*60/Beat.BPM*SR),len=Math.max(n,st+L+SR/4|0);mix=new Float32Array(len);mix.set(pcm);for(let i=0;i<L;i++){const e=Math.min(1,(L-i)/(SR*.15));mix[st+i]+=beat[i]*.85*e}}
+ const m=mix.length;for(let i=0;i<m;i++)mix[i]=Math.tanh(mix[i]*1.05)*.95; // 귀를 보호하는 상한
+ return{pcm:mix,events,text,skipped,totalMs:m/SR*1000,specials}}
