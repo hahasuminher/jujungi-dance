@@ -4,7 +4,14 @@ const SR=22050;
 const VOICE_DEFAULT={id:'helium',name:'헬륨 쪼꼬미',pitch:85,rate:135,range:90,speed:1.32,wobble:0,robot:0};
 const VOICE_PRESETS=[VOICE_DEFAULT,
  {id:'greasy',name:'느끼한 아저씨',pitch:25,rate:125,range:95,speed:.8,wobble:.5,robot:0},
- {id:'robot',name:'고장난 로봇',pitch:45,rate:140,range:10,speed:1,wobble:.15,robot:.55}];
+ {id:'robot',name:'고장난 로봇',pitch:45,rate:140,range:10,speed:1,wobble:.15,robot:.55},
+ {id:'grim',name:'저승사자',pitch:5,rate:105,range:15,speed:.72,wobble:.1,robot:.08},
+ {id:'grandma',name:'동네 할머니',pitch:62,rate:120,range:99,speed:.96,wobble:.75,robot:0},
+ {id:'baby',name:'옹알이 아기',pitch:99,rate:115,range:99,speed:1.55,wobble:.2,robot:0},
+ {id:'alien',name:'외계인',pitch:72,rate:150,range:60,speed:1.16,wobble:.35,robot:.82},
+ {id:'drunk',name:'취한 아저씨',pitch:32,rate:98,range:90,speed:.84,wobble:.95,robot:0},
+ {id:'anchor',name:'뉴스 앵커',pitch:52,rate:175,range:28,speed:1.02,wobble:0,robot:0},
+ {id:'mosquito',name:'모기',pitch:99,rate:170,range:35,speed:1.85,wobble:.5,robot:.2}];
 async function bootVoice(){
  const data=await (await fetch('vendor/espeak.data')).arrayBuffer();
  const m=await Promise.race([ESPEAK({getPreloadedPackage:()=>data,locateFile:f=>f,print(){},printErr(){}}),new Promise((_,no)=>setTimeout(()=>no(new Error('timeout')),15000))]);
@@ -68,6 +75,6 @@ function buildSpeech(raw,v){
   parts.push(finalOut);t+=finalOut.length/SR*1000;const gap=seg.dots?.28:.09;parts.push(new Float32Array(Math.round(gap*SR)));t+=gap*1000}
  const n=parts.reduce((a,p)=>a+p.length,0),pcm=new Float32Array(n);let o=0;for(const p of parts){pcm.set(p,o);o+=p.length}
  events.sort((a,b)=>a.ms-b.ms);let mix=pcm;
- if(specials.length){const sp=specials[0];specials.length=1;const beat=Beat.get(SR,16),st=Math.round(sp.ms/1000*SR),L=Math.round(16*60/Beat.BPM*SR),len=Math.max(n,st+L+SR/4|0);mix=new Float32Array(len);mix.set(pcm);for(let i=0;i<L;i++){const e=Math.min(1,(L-i)/(SR*.15));mix[st+i]+=beat[i]*.85*e}}
+ if(specials.length){const sp=specials[0];specials.length=1;const beat=Beat.get(SR,16,BGM_OF[sp.name]||'dumchit'),st=Math.round(sp.ms/1000*SR),L=Math.round(16*60/Beat.BPM*SR),len=Math.max(n,st+L+SR/4|0);mix=new Float32Array(len);mix.set(pcm);for(let i=0;i<L;i++){const e=Math.min(1,(L-i)/(SR*.15));mix[st+i]+=beat[i]*.85*e}}
  const m=mix.length;for(let i=0;i<m;i++)mix[i]=Math.tanh(mix[i]*1.05)*.95; // 귀를 보호하는 상한
  return{pcm:mix,events,text,skipped,totalMs:m/SR*1000,specials}}

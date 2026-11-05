@@ -1,16 +1,28 @@
-/* 둠칫 비트: 코드로 합성해서 말소리에 섞는다. 휴대폰에서도 같은 음성 파일로 재생된다 */
-const Beat=(()=>{const BPM=118,S=60/BPM/4,NOTES=[55,0,55,0,0,65.4,0,55,73.4,0,0,55,0,49,0,55],MEL={6:440,7:523,14:392,15:330};let cache=null;
- function render(sr,beats){const N=Math.ceil(beats*60/BPM*sr)+sr,x=new Float32Array(N),add=(t,fn,dur,g)=>{const i0=Math.floor(t*sr),n=Math.min(Math.floor(dur*sr),N-i0);for(let i=0;i<n;i++)x[i0+i]+=fn(i/sr)*g};
-  let ph=0,lp=0;const kick=(t)=>{const f=48+110*Math.exp(-t*32);ph+=2*Math.PI*f/sr;return Math.sin(ph)*Math.exp(-t*12)},noise=()=>Math.random()*2-1;
-  const steps=beats*4;for(let k=0;k<steps;k++){const s=k%16,bar=Math.floor(k/16),t=k*S;
-   if(s%4===0){ph=0;add(t,kick,.24,1)}if(s===14&&bar%2){ph=0;add(t,kick,.2,.75)}
-   if(s===4||s===12){let y=0,y2=0;add(t,u=>{const n=noise();y+=.42*(n-y);y2=n-y;return(y-y2*.3)*Math.exp(-u*22)*1.6},.16,.75)}
-   if(s%2===1){let p=0;add(t,u=>{const n=noise(),h=n-p;p=n;return h*Math.exp(-u*110)},.04,.22)}
-   if(NOTES[s]){const f=NOTES[s],d=S*1.5;add(t,u=>(Math.sign(Math.sin(2*Math.PI*f*u))*.55+.45*Math.sin(2*Math.PI*f*u))*Math.min(1,Math.exp(-u*6)*1.4)*Math.min(1,(d-u)*40),d,.42)}
-   if(bar%2&&MEL[s]){const f=MEL[s];add(t,u=>Math.sign(Math.sin(2*Math.PI*f*u))*Math.exp(-u*18),.11,.14)}}
-  for(let i=0;i<N;i++)x[i]=Math.tanh(x[i]*1.5);return x}
- return{get(sr,beats){if(!cache||cache.b!==beats)cache={b:beats,x:render(sr,beats)};return cache.x},BPM}})();
-
+/* 스페셜 BGM: 장르마다 드럼과 멜로디를 코드로 합성해 말소리에 섞는다. 춤과 맞도록 전부 118BPM */
+const STYLES=(()=>{const Nt={A1:55,C2:65.4,D2:73.4,E2:82.4,F2:87.3,G2:98,A2:110,C3:130.8,D3:146.8,E3:164.8,F3:174.6,G3:196,A3:220,B3:246.9,C4:261.6,D4:293.7,E4:329.6,F4:349.2,G4:392,A4:440,B4:493.9,C5:523.3,D5:587.3,E5:659.3,G5:784,Eb3:155.6,Bb2:116.5,Eb4:311.1,Bb3:233.1,Ab3:207.7};
+const _=0,{A1,C2,D2,E2,F2,G2,A2,C3,D3,E3,F3,G3,A3,B3,C4,D4,E4,F4,G4,A4,B4,C5,D5,E5,G5,Eb3,Bb2,Eb4,Bb3,Ab3}=Nt;
+return{
+ dumchit:{kick:[0,4,8,12],clap:[4,12],hat:[1,3,5,7,9,11,13,15],bass:[A1,_,A1,_,_,C2,_,A1,D2,_,_,A1,_,G2/2,_,A1],mel:[_,_,_,_,_,_,A4,C5,_,_,_,_,_,_,G4,E4],wave:'sq',bv:.42,mv:.14},
+ disco:{kick:[0,4,8,12],clap:[4,12],hat:[2,6,10,14],open:1,bass:[A1,A2,A1,A2,A1,A2,A1,A2,F2,F2*2,F2,F2*2,G2,G2*2,G2,G2*2],mel:[E5,_,D5,_,C5,_,D5,_,_,E5,_,G5,_,E5,_,D5],wave:'saw',bv:.42,mv:.13},
+ trot:{kick:[0,8],clap:[4,12],hat:[2,6,10,14],bass:[A1,_,E2,_,A1,_,E2,_,D2,_,A2,_,E2,_,E2*2,_],mel:[A4,_,C5,D5,E5,_,_,_,D5,C5,A4,_,C5,_,A4,_],wave:'tri',bv:.45,mv:.28,vib:1},
+ chip:{kick:[0,6,8,14],clap:[4,12],hat:[0,2,4,6,8,10,12,14],bass:[C2,C2,G2,G2,A1,A1,E2,E2,F2,F2,C2*2,C2*2,G2,G2,G2,G2],mel:[C5,E5,G5,C5,A4,C5,E5,A4,F4,A4,C5,F4,G4,B4,D5,G4],wave:'sq',bv:.32,mv:.17},
+ funeral:{kick:[0,12],clap:[],hat:[],bass:[A1,_,_,_,_,_,_,_,F2,_,_,_,E2,_,_,_],mel:[A3,_,_,A3,C4,_,_,_,B3,_,_,A3,A3,_,_,_],wave:'tri',bv:.55,mv:.32,slow:1},
+ march:{kick:[0,8],clap:[4,6,12,14],hat:[2,10],bass:[C2,_,G2,_,C2,_,G2,_,F2,_,C2*2,_,G2,_,G2,_],mel:[G4,_,G4,G4,C5,_,E5,_,D5,_,B4,_,C5,_,_,_],wave:'saw',bv:.4,mv:.17},
+ lofi:{kick:[0,10],clap:[4,12],hat:[2,6,10,14],soft:1,bass:[D2,_,_,D2,_,_,G2,_,C2,_,_,C2,_,_,A1,_],mel:[F4,_,A4,_,_,C5,_,_,E4,_,G4,_,_,A4,_,_],wave:'tri',bv:.45,mv:.2},
+ polka:{kick:[0,4,8,12],clap:[2,6,10,14],hat:[],bass:[C2,_,G2,_,C2,_,G2,_,G2,_,D2,_,G2,_,C2,_],mel:[E5,D5,C5,D5,E5,_,E5,_,D5,C5,B4,C5,D5,_,G4,_],wave:'sq',bv:.42,mv:.15},
+ horror:{kick:[0,3],clap:[12],hat:[],bass:[A1,_,_,_,Bb2/2,_,_,_,A1,_,_,_,Eb3/4,_,_,_],mel:[A4,_,Bb3*2,_,A4,_,_,Eb4,_,_,A4,_,Bb3*2,_,_,_],wave:'saw',bv:.5,mv:.14,vib:1}};})();
+const BGM_OF={run:'disco',melt:'funeral',love:'lofi',chicken:'polka',lotto:'disco',sink:'horror',zombie:'funeral',bigmouth:'dumchit',headspin:'chip',windmill:'chip',combo:'disco',sixstep:'chip',groove:'dumchit',commute:'funeral',salary:'trot',diet:'polka',exam:'horror',doom:'funeral',jackpot:'disco',moon:'chip',crash:'horror',soju:'trot',coffee:'chip',snack:'trot',sleepy:'lofi',mom:'horror',boss:'march',bday:'polka'};
+const Beat=(()=>{const BPM=118,S=60/BPM/4,cache={};
+ function render(sr,beats,name){const st=STYLES[name],Nn=Math.ceil(beats*60/BPM*sr)+sr,x=new Float32Array(Nn),add=(t,fn,dur,g)=>{const i0=Math.floor(t*sr),n=Math.min(Math.floor(dur*sr),Nn-i0);for(let i=0;i<n;i++)x[i0+i]+=fn(i/sr)*g};
+  const wav1=(f,u,w,vib)=>{const ff=vib?f*(1+.012*Math.sin(2*Math.PI*5.5*u)):f,ph=(u*ff)%1;return w==='sq'?(ph<.5?1:-1):w==='saw'?2*ph-1:1-4*Math.abs(ph-.5)};
+  const steps=beats*4,kv=st.soft?.7:1;for(let k=0;k<steps;k++){const s=k%16,bar=Math.floor(k/16),t=k*S;
+   if(st.kick.includes(s)){let ph=0;add(t,u=>{ph+=2*Math.PI*(48+110*Math.exp(-u*32))/sr;return Math.sin(ph)*Math.exp(-u*12)},.24,kv)}
+   if(st.clap.includes(s)){let y=0;add(t,u=>{const n=Math.random()*2-1;y+=.42*(n-y);return(n-y)*Math.exp(-u*24)*1.1},.15,st.soft?.4:.7)}
+   if(st.hat.includes(s)){let p=0;const d=st.open?.12:.04;add(t,u=>{const n=Math.random()*2-1,h=n-p;p=n;return h*Math.exp(-u*(st.open?30:110))},d,.22)}
+   const bn=st.bass[s];if(bn){const d=S*(st.slow?3.5:1.5);add(t,u=>(wav1(bn,u,'sq')*.5+Math.sin(2*Math.PI*bn*u)*.5)*Math.min(1,Math.exp(-u*(st.slow?1.5:6))*1.4)*Math.min(1,(d-u)*40),d,st.bv)}
+   const mn=st.mel[s];if(mn&&(bar%2||name!=='dumchit')){const d=S*(st.slow?3.5:1.6);add(t,u=>wav1(mn,u,st.wave,st.vib)*Math.exp(-u*(st.slow?1.2:7))*Math.min(1,u*200)*Math.min(1,(d-u)*40),d,st.mv)}}
+  for(let i=0;i<Nn;i++)x[i]=Math.tanh(x[i]*1.5);return x}
+ return{get(sr,beats,name='dumchit'){const k=name+beats;if(!cache[k])cache[k]=render(sr,beats,name);return cache[k]},BPM}})();
 /* 클럽 EDM: 128BPM 8마디를 합성해 필요한 길이로 반복 */
 const EDM=(()=>{const BPM=128,B=60/BPM;let cache=null;
  function bars(sr){const N=Math.round(B*32*sr),x=new Float32Array(N);const CH=[[110,130.8,164.8],[87.3,130.8,174.6],[98,146.8,196],[82.4,123.5,164.8]];let lp=0;
