@@ -22,7 +22,7 @@ export class Room extends DurableObject{
    const t=(a.times||[]).filter(x=>now-x<60000);if(t.length&&now-t[t.length-1]<2500)return this.send(ws,{type:'denied',why:'조금만 천천히 외쳐 주세요.'});if(t.length>=10)return this.send(ws,{type:'denied',why:'1분에 10번까지만 외칠 수 있어요.'});
    const text=String(m.text||'').slice(0,120).trim();if(!text)return;const r=check(text);if(!r.ok)return this.send(ws,{type:'denied',why:r.why});t.push(now);a.times=t;ws.serializeAttachment(a);
    const mic=Math.hypot(a.x-MIC.x,a.y-MIC.y)<=MIC.r;const key=r.masked.replace(/[\s.,!?~]/g,'');this.recent=this.recent.filter(x=>now-x.t<10000);this.recent.push({t:now,key,no:a.no});const same=new Set(this.recent.filter(x=>x.key===key).map(x=>x.no));if(same.size>=2&&key.length>=2){this.recent=this.recent.filter(x=>x.key!==key);this.all({type:'combo',word:r.masked.slice(0,12),n:same.size})}this.all({type:'shout',id:crypto.randomUUID().slice(0,8),no:a.no,text:mic?r.masked:r.text,masked:r.masked,mic,voice:cleanVoice(m.voice)})}
-  else if(m.type==='move'){if(now-(a.mv||0)<300)return;a.mv=now;a.x=num(m.x,0,WORLD,a.x);a.y=num(m.y,0,WORLD,a.y);ws.serializeAttachment(a);const s=JSON.stringify({type:'pos',no:a.no,x:a.x,y:a.y});for(const w of this.peers())if(w!==ws)try{w.send(s)}catch(e){}}
+  else if(m.type==='move'){if(now-(a.mv||0)<180)return;a.mv=now;a.x=num(m.x,0,WORLD,a.x);a.y=num(m.y,0,WORLD,a.y);ws.serializeAttachment(a);const s=JSON.stringify({type:'pos',no:a.no,x:a.x,y:a.y});for(const w of this.peers())if(w!==ws)try{w.send(s)}catch(e){}}
   else if(m.type==='pose'){if(!['sit','lie','stand'].includes(m.k))return;this.others(ws,{type:'pose',no:a.no,k:m.k})}
   else if(m.type==='link'){if(!['train','ride','none'].includes(m.k))return;a.link=typeof m.to==='number'?m.to:0;a.linkK=m.k;ws.serializeAttachment(a);this.all({type:'link',no:a.no,to:a.link,k:m.k})}
   else if(m.type==='jump'){if(now-(a.jp||0)<700)return;a.jp=now;ws.serializeAttachment(a);this.others(ws,{type:'jump',no:a.no})}
@@ -38,7 +38,9 @@ export class Room extends DurableObject{
  async webSocketError(ws){this.all({type:'roster',roster:this.roster(ws)})}
 }
 async function hashIp(ip,env){const d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(ip+(env.SALT||'jujungi')));return[...new Uint8Array(d)].slice(0,8).map(b=>b.toString(16).padStart(2,'0')).join('')}
+/* 한국과 일본 사용자가 많아 동북아시아 쪽에 방을 만들도록 요청한다 */
+const roomStub=(env,i)=>env.ROOM.get(env.ROOM.idFromName('apac-room-'+i),{locationHint:'apac-ne'});
 export default{async fetch(req,env){const u=new URL(req.url);
-  if(u.pathname==='/api/room'){for(let i=1;i<=MAX_ROOMS;i++){const st=env.ROOM.get(env.ROOM.idFromName('room-'+i)),r=await st.fetch('https://room/count');const{n}=await r.json();if(n<MAX)return Response.json({room:i,n})}return Response.json({room:0},{status:503})}
-  if(u.pathname==='/ws'){const room=Math.max(1,Math.min(MAX_ROOMS,parseInt(u.searchParams.get('room'))||1));const o=req.headers.get('origin');if(o&&new URL(o).host!==u.host)return new Response('forbidden',{status:403});return env.ROOM.get(env.ROOM.idFromName('room-'+room)).fetch(req)}
+  if(u.pathname==='/api/room'){for(let i=1;i<=MAX_ROOMS;i++){const st=roomStub(env,i),r=await st.fetch('https://room/count');const{n}=await r.json();if(n<MAX)return Response.json({room:i,n})}return Response.json({room:0},{status:503})}
+  if(u.pathname==='/ws'){const room=Math.max(1,Math.min(MAX_ROOMS,parseInt(u.searchParams.get('room'))||1));const o=req.headers.get('origin');if(o&&new URL(o).host!==u.host)return new Response('forbidden',{status:403});return roomStub(env,room).fetch(req)}
   return env.ASSETS.fetch(req)}};

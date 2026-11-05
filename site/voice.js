@@ -62,7 +62,7 @@ function jamoEvents(spoken,ev,toOut,offsetMs,charOff,wordBase,total){
  words.forEach((w,wi)=>{const from=w.text_position-1,nw=words[wi+1],to=nw?nw.text_position-1:chars.length,start=w.audio_position,after=stops.find(p=>p>start);add(from,to,start,after===undefined?total*1000/SR:after,wi)});
  return out}
 /* 전체 문장을 하나의 소리와 타임라인으로 */
-function buildSpeech(raw,v){
+function buildSpeech(raw,v,opt={}){
  const segs=splitSegments(raw);const parts=[];let text='',skipped=0,events=[],t=0,wordBase=0;const specials=[];
  for(const seg of segs){const r=toSpoken(seg.raw);skipped+=r.skipped;const spoken=r.spoken.replace(/[.,!?]/g,' ').replace(/\s+/g,' ').trim();if(!spoken||!/[가-힣]/.test(spoken))continue;
   const p=synthSeg(spoken,seg,v),w=warp(p,seg,v),ex=Math.min(seg.ex,6),gain=.62+.075*ex,drive=1.1+ex*.42;
@@ -75,6 +75,6 @@ function buildSpeech(raw,v){
   parts.push(finalOut);t+=finalOut.length/SR*1000;const gap=seg.dots?.28:.09;parts.push(new Float32Array(Math.round(gap*SR)));t+=gap*1000}
  const n=parts.reduce((a,p)=>a+p.length,0),pcm=new Float32Array(n);let o=0;for(const p of parts){pcm.set(p,o);o+=p.length}
  events.sort((a,b)=>a.ms-b.ms);let mix=pcm;
- if(specials.length){const sp=specials[0];specials.length=1;const beat=Beat.get(SR,16,BGM_OF[sp.name]||'dumchit'),st=Math.round(sp.ms/1000*SR),L=Math.round(16*60/Beat.BPM*SR),len=Math.max(n,st+L+SR/4|0);mix=new Float32Array(len);mix.set(pcm);for(let i=0;i<L;i++){const e=Math.min(1,(L-i)/(SR*.15));mix[st+i]+=beat[i]*.85*e}}
+ if(specials.length&&!opt.plain){const sp=specials[0];specials.length=1;const beat=Beat.get(SR,16,BGM_OF[sp.name]||'dumchit'),st=Math.round(sp.ms/1000*SR),L=Math.round(16*60/Beat.BPM*SR),len=Math.max(n,st+L+SR/4|0);mix=new Float32Array(len);mix.set(pcm);for(let i=0;i<L;i++){const e=Math.min(1,(L-i)/(SR*.15));mix[st+i]+=beat[i]*.85*e}}
  const m=mix.length;for(let i=0;i<m;i++)mix[i]=Math.tanh(mix[i]*1.05)*.95; // 귀를 보호하는 상한
  return{pcm:mix,events,text,skipped,totalMs:m/SR*1000,specials}}

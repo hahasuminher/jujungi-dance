@@ -149,7 +149,7 @@ const wrap=a=>{a=(a+PIm)%TAU;return a<0?a+TAU-PIm:a-PIm};
 function setTarget(p,o={}){T.body=p.body;T.head=p.head;T.rot=p.rot;T.cel=p.cel;T.mir=p.mir;if(p.head.k!==hkB||!!p.head.flip!==hfB){hkA=hkU<.5?hkA:hkB;hfA=hkU<.5?hfA:hfB;hkB=p.head.k;hfB=!!p.head.flip;hkU=0}
  if(o.snap){R.dx=o.dx??R.dx;R.dy=o.dy??R.dy;R.vx=R.vy=0}if(o.dx!==undefined)T.dx=o.dx;if(o.dy!==undefined)T.dy=o.dy;cloneOn=o.clones?1:0;orbit=o.orbit?1:0;if(o.mouth)mouthExtra=o.mouth}
 T.dx=0;T.dy=0;
-function stepBody(dt){const h=dt/2;for(let n=0;n<2;n++)for(let i=0;i<M*2;i++){const w=seg[i>>1],k=lerp(820,420,w),c=2*Math.sqrt(k)*.48;V0[i]+=((T.body[i]-X[i])*k-V0[i]*c)*h;X[i]+=V0[i]*h}
+function stepBody(dt){const sn=lowP?1:2,h=dt/sn;for(let n=0;n<sn;n++)for(let i=0;i<M*2;i++){const w=seg[i>>1],k=lerp(820,420,w),c=2*Math.sqrt(k)*.48;V0[i]+=((T.body[i]-X[i])*k-V0[i]*c)*h;X[i]+=V0[i]*h}
  let da=T.head.ang-H.ang;while(da>PIm)da-=TAU;while(da<-PIm)da+=TAU;const kk=680,cc=2*Math.sqrt(kk)*.55;H.vx+=((T.head.x-H.x)*kk-H.vx*cc)*dt;H.x+=H.vx*dt;H.vy+=((T.head.y-H.y)*kk-H.vy*cc)*dt;H.y+=H.vy*dt;H.va+=(da*kk-H.va*cc)*dt;H.ang+=H.va*dt;H.vs+=((T.head.s-H.s)*kk-H.vs*cc)*dt;H.s+=H.vs*dt;
  const kr=orbit?70:560,cr=2*Math.sqrt(kr)*.7;R.v+=((T.rot-R.rot)*kr-R.v*cr)*dt;R.rot+=R.v*dt;const kd=120,cd=2*Math.sqrt(kd)*.8;R.vx+=((T.dx-R.dx)*kd-R.vx*cd)*dt;R.dx+=R.vx*dt;R.vy+=((T.dy-R.dy)*kd-R.vy*cd)*dt;R.dy+=R.vy*dt;
  hkU=Math.min(1,hkU+dt*8);mouth=Math.max(0,mouth-dt*7);mouthExtra=Math.max(0,mouthExtra-dt*1.6)}
@@ -170,7 +170,7 @@ function draw(g,ox,oy,S,tick,raster){const sd=tick*2.1;const lw=2.6/S*Math.min(1
  g.restore();g.restore()}
 /* 평소 춤: 뼈대 자세를 윤곽 목표로 삼아 탄력 있게 따라간다. 전신 동작을 덮어 쓴다 */
 let curC=null,curV=null,curW=null,tC=0,tV=0,tW=0,wCool=0,fxv={ex:0,q:0,til:0,dots:false},ghostOn=0,trail=[];
-let clock=0,lastSpin=-99,lastKind='s';const recent=[],shuffle2=x=>{x=[...x];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x};
+let lowP=false,lowT=0,clock=0,lastSpin=-99,lastKind='s';const recent=[],shuffle2=x=>{x=[...x];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x};
 const ARM=['al','ar','bl','br','sl','sr'],SOFT=['hr','hx','hy','hs'];
 const IDLE={...A,cel:null};const NECK_REST=Math.hypot(A.head.x-A.body[0],A.head.y+.38*HH-A.body[1]);
 function liveTarget(dt,now){tC+=dt;tV+=dt;if(curW){tW+=dt;if(tW>=curW.dur){curW=null;wCool=.04;R.rot=wrap(R.rot)}}else wCool=Math.max(0,wCool-dt);
@@ -180,10 +180,10 @@ function liveTarget(dt,now){tC+=dt;tV+=dt;if(curW){tW+=dt;if(tW>=curW.dur){curW=
  if(curW){curW.f(tW,P);for(const k of ARM)P[k]=P[k]+(Q[k]-REST[k])*.6;for(const k of SOFT)P[k]=P[k]+(Q[k]-REST[k])*.5}else{Object.assign(P,Q);for(const k of['al','ar','bl','br','ll','lr','kl','kr','bd','tw','rx','ry','hx','hy','hr'])P[k]*=1.3}
  const a=1+.16*Math.min(5,fxv.ex);for(const k of['al','ar','bl','br','ll','lr','kl','kr','hr','bd','tw','rx','ry','hy','hx'])P[k]*=a;P.hs*=1+.08*Math.min(5,fxv.ex);
  if(fxv.q)P.hr+=Math.sin(now/55)*.3*Math.min(3,fxv.q);if(fxv.til){P.tw+=Math.sin(now/170)*.6;P.bd+=Math.cos(now/170)*.5}if(fxv.dots){P.ry+=.03;P.al*=.3;P.ar*=.3;P.hy+=.03}
- cloneOn=P.clones>.5?1:0;ghostOn=P.ghost>.5?1:0;const c=capture({...P,rr:0,clones:0,ghost:0});c.rot=P.rr;setTarget(c)}
+ cloneOn=P.clones>.5?1:0;ghostOn=P.ghost>.5?1:0;if(lowP&&(lowT=(lowT+1)%3)){T.rot=P.rr;return}const c=capture({...P,rr:0,clones:0,ghost:0});c.rot=P.rr;setTarget(c)}
 function drawTrail(g,ox,oy,S,accent){if(!ghostOn){trail.length=0;return}trail.push(X.slice());if(trail.length>9)trail.shift();g.save();g.translate(ox+R.dx*H_U*S,oy+R.dy*H_U*S);g.rotate(R.rot);g.scale(S,S);g.translate(-CXs,-CYs);g.strokeStyle=accent?'#0d0d0d':'#ff2bb3';g.lineWidth=3/S;trail.forEach((q,n)=>{if(n%2)return;g.globalAlpha=.16+.05*n;g.beginPath();for(let i=0;i<M;i+=2){i?g.lineTo(q[i*2],q[i*2+1]):g.moveTo(q[i*2],q[i*2+1])}g.closePath();g.stroke()});g.restore();g.globalAlpha=1}
 const FINALE={run:'sixstep',melt:'headspin',love:'lotto',chicken:'windmill',lotto:'combo',sink:'headspin',zombie:'sixstep',bigmouth:'lotto',headspin:'windmill',windmill:'headspin',sixstep:'combo',combo:'groove',groove:'combo',commute:'melt',salary:'sink',diet:'chicken',exam:'run',doom:'melt',jackpot:'combo',moon:'headspin',crash:'sink',soju:'windmill',coffee:'run',snack:'love',sleepy:'zombie',mom:'sixstep',boss:'sixstep',bday:'groove',bye:'run',night:'sleepy'};
-return{setImages(i){Object.assign(IMG,i)},reseed,
+return{setLow(v){lowP=v},setImages(i){Object.assign(IMG,i)},reseed,
  update(dt,now){clock+=dt;if(bigSeq){bigT+=dt/BEAT;while(bigI<bigSeq.length&&bigSeq[bigI][0]<=bigT){const[,p,o]=bigSeq[bigI];setTarget(p,o||{dx:T.dx,dy:T.dy});bigI++}if(bigT>=16.1){bigSeq=null;cloneOn=0;orbit=0;endBig()}}else liveTarget(dt,now);stepBody(dt);let e=0;for(let i=0;i<M*2;i+=11)e+=Math.abs(X[i]-T.body[i]);settled=!!bigSeq&&e/(M*2/11)<2.4&&Math.abs(H.x-T.head.x)<3&&hkU>=1&&Math.abs(wrap(R.rot-T.rot))<.02},
  render(g,W,Ht,S,ox,oy,tick,calm,accent){const orb=orbit?[Math.cos(now2()/500)*W*.05,Math.sin(now2()/500)*Ht*.04]:[0,0];drawTrail(g,ox,oy,S,accent);if(cloneOn){draw(g,ox-W*.31,oy+Ht*.12,S*.62,tick,false);draw(g,ox+W*.31,oy+Ht*.12,S*.62,tick,false)}draw(g,ox+orb[0],oy+orb[1],S,tick,true)},
  eyes(W,Ht,S,ox,oy){const px=(H.x-CXs)*S,py=(H.y-CYs)*S,cr=Math.cos(R.rot),sr=Math.sin(R.rot),c0=[ox+R.dx*H_U*S+px*cr-py*sr,oy+R.dy*H_U*S+px*sr+py*cr],a=H.ang+R.rot,e=HH*H.s*S;return[-1,1].map(q=>[c0[0]+Math.cos(a)*q*e*.19-Math.sin(a)*-.03*e,c0[1]+Math.sin(a)*q*e*.19+Math.cos(a)*-.03*e])},
