@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id),store={get(k,d){try{const v=localStorage
 const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let voice={...VOICE_DEFAULT,...store.get('jd.voice',{})},seed=(Math.random()*2**31)|0,found=new Set(store.get('jd.found',[]));
 const cv=$('cv'),g=cv.getContext('2d');let W=0,Ht=0,dpr=1;
-function size(){const r=cv.getBoundingClientRect();dpr=Math.min(2,devicePixelRatio||1);W=r.width;Ht=r.height;cv.width=W*dpr;cv.height=Ht*dpr}
+let dprLock=0;function size(){const r=cv.getBoundingClientRect();dpr=dprLock||Math.min(2,devicePixelRatio||1);W=r.width;Ht=r.height;cv.width=W*dpr;cv.height=Ht*dpr}
 new ResizeObserver(size).observe(cv);size();
 let play=null,events=[],evI=0,specials=[],spI=0,subText='',subI=-1,lastHalf=-1,tick=-1,burstHue=0,lastWord=-1,lastBurst=0,burst=0,last=performance.now();
 const player=new Audio();player.preload='auto';player.setAttribute('playsinline','');let wavUrl=null;
@@ -14,17 +14,18 @@ function render(now){g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle='#fff';g.fillRe
 function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;
  if(play){const ms=play.clock();while(evI<events.length&&events[evI].ms<=ms)fire(events[evI++]);while(spI<specials.length&&specials[spI].ms<=ms){const sp=specials[spI++];if(Dance.big(sp.name))FX.start(sp.name,sp.word,W,Ht);if(!found.has(sp.word)){found.add(sp.word);store.set('jd.found',[...found]);showFound()}}if(ms>=play.total)finish()}
  Dance.update(dt,now);if(FX.isOn()&&!Dance.isBig())FX.stop();FX.update(dt,W,Ht);if(Dance.isBig()&&Math.floor(Dance.bigBeat()/2)!==lastHalf){lastHalf=Math.floor(Dance.bigBeat()/2);burstHue=1-burstHue}burst+=(((play||Dance.isBig())?1:0)-burst)*.14;
- tick=Math.floor(now/110);render(now);requestAnimationFrame(loop)}
+ tick=Math.floor(now/110);render(now);if(rec&&rec.mr)drawFrame();requestAnimationFrame(loop)}
 function fire(e){const j=$('jamo');j.textContent=e.j;if(!calm)j.style.transform=`rotate(${(Math.random()*26-13).toFixed(1)}deg) scale(${(.9+Math.random()*.25+e.ex*.05).toFixed(2)})`;Dance.event(e);
  if(e.idx!==subI){subI=e.idx;drawSub()}const t=performance.now();if(e.word!==lastWord&&t-lastBurst>340){lastBurst=t;lastWord=e.word;burstHue=1-burstHue}}
 function drawSub(){const el=$('sub'),a=[...subText];if(!a.length){el.textContent='';return}const st=Math.max(0,subI-34),en=Math.min(a.length,st+60),h=document.createElement('b');h.textContent=a[subI]||'';const t=document.createElement('span');t.className='t';t.append(a.slice(st,Math.max(st,subI)).join(''),h,a.slice(subI+1,en).join(''));el.replaceChildren(t)}
 function stopAudio(){player.onended=null;player.pause();if('speechSynthesis'in window)speechSynthesis.cancel();play=null;events=[];evI=0;specials=[];spI=0}
-function finish(){stopAudio();Dance.relax();$('jamo').textContent='';subI=-1;$('sub').textContent='';setBtn(false)}
+function finish(){stopAudio();Dance.relax();stopRec();$('jamo').textContent='';subI=-1;$('sub').textContent='';setBtn(false)}
 function setBtn(on){const b=$('go');b.dataset.on=on?'1':'0';b.textContent=on?'닥쳐':'주둥이 털기'}
-function speak(){if(play){finish();Dance.stop();FX.stop();return}if(Dance.isBig()){Dance.stop();FX.stop()}const msg=$('msg');msg.textContent='';msg.className=''; const raw=$('say').value;const s=engine?buildSpeech(raw,voice):null;
- if(engine&&(!s||!s.text)){msg.textContent='읽을 글자가 없어요. 한글, 영어, 숫자를 넣어 주세요.';msg.className='err';return}
+function speak(recording){if(recording!==true)recording=false;if(play){finish();Dance.stop();FX.stop();return}if(Dance.isBig()){Dance.stop();FX.stop()}const msg=$('msg');msg.textContent='';msg.className=''; const raw=$('say').value;const s=engine?buildSpeech(raw,voice):null;
+ if(engine&&(!s||!s.text)){msg.textContent='읽을 글자가 없어요. 한글, 영어, 숫자를 넣어 주세요.';msg.className='err';if(recording)endRec();return}
+ if(recording&&!engine){msg.textContent='영상 저장에는 웃긴 목소리가 필요해요.';msg.className='err';endRec();return}
  if(s&&s.skipped)msg.textContent=`읽을 수 없는 글자 ${s.skipped}개는 건너뛰었어요.`;
- if(engine){subText=s.text;events=s.events;evI=0;specials=s.specials;spI=0;if(wavUrl)URL.revokeObjectURL(wavUrl);wavUrl=URL.createObjectURL(wav(s.pcm,SR));player.src=wavUrl;player.onended=finish;const pr=player.play();if(pr)pr.catch(e=>{console.warn(e);msg.textContent='소리를 재생하지 못했어요. 기기 음량을 확인하고 다시 눌러 주세요.';msg.className='err'});play={clock:()=>player.currentTime*1000,total:s.totalMs+300}}
+ if(engine){subText=s.text;events=s.events;evI=0;specials=s.specials;spI=0;if(wavUrl)URL.revokeObjectURL(wavUrl);wavUrl=URL.createObjectURL(wav(s.pcm,SR));player.src=wavUrl;player.onended=finish;if(recording)beginRec(s.pcm);const pr=player.play();if(pr)pr.catch(e=>{console.warn(e);msg.textContent='소리를 재생하지 못했어요. 기기 음량을 확인하고 다시 눌러 주세요.';msg.className='err'});play={clock:()=>player.currentTime*1000,total:s.totalMs+300}}
  else{const{spoken}=toSpoken(raw);if(!spoken){msg.textContent='읽을 글자가 없어요.';msg.className='err';return}subText=spoken;const chars=[...spoken],list=[];chars.forEach((ch,i)=>{const d=decompose(ch);if(d)d.forEach((x,k)=>list.push({...x,idx:i,word:0,ex:0,q:0,til:0,dots:false,ms:i*190+k*60}))});events=list;evI=0;const t0=performance.now();play={clock:()=>performance.now()-t0,total:chars.length*190};if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(spoken);u.lang='ko-KR';u.pitch=2;u.rate=1.25;speechSynthesis.speak(u)}}
  subI=-1;lastWord=-1;drawSub();setBtn(true)}
 /* 목소리 */
@@ -36,7 +37,27 @@ $('voiceSave').onclick=()=>{const list=store.get('jd.custom',[]),id='c'+Date.now
 /* 공유 */
 const enc=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const dec=s=>JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/')))));
-$('share').onclick=async()=>{const code=enc({t:$('say').value.slice(0,300),v:voice,s:seed}),url=location.href.split('#')[0]+'#d='+code;try{await navigator.clipboard.writeText(url);$('msg').textContent='링크를 복사했어요. 친구에게 보내세요.'}catch(e){$('msg').textContent=url}};
+const SITE=location.origin+location.pathname;
+$('share').onclick=async()=>{if(navigator.share){try{await navigator.share({title:'주둥이 댄스',text:'아무 말이나 외치면 아저씨가 춤춘다',url:SITE});return}catch(e){if(e.name==='AbortError')return}}try{await navigator.clipboard.writeText(SITE);$('msg').textContent='사이트 주소를 복사했어요.'}catch(e){$('msg').textContent=SITE}};
+$('shuffle').onclick=()=>{seed=(Math.random()*2**31)|0;Dance.reseed(seed);$('msg').className='';$('msg').textContent='자모별 춤을 새로 섞었어요.'};
+/* 영상 저장: 무대를 9:16 화면에 옮겨 그리며 녹화 */
+let rec=null;
+const VW=720,VH=1280;
+function pickType(){if(!window.MediaRecorder)return null;return['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'].find(t=>MediaRecorder.isTypeSupported(t))||null}
+function drawFrame(){const c=rec.g,w=VW,h=VH;c.fillStyle='#fff';c.fillRect(0,0,w,h);c.fillStyle='#0d0d0d';c.textAlign='center';c.font='400 96px "East Sea Dokdo","Noto Sans CJK KR",cursive';c.save();c.translate(w/2,120);c.rotate(-.03);c.fillStyle='#f4ff1f';c.fillRect(-190,-72,380,104);c.fillStyle='#0d0d0d';c.fillText('주둥이 댄스',0,0);c.restore();
+ const top=170,boxH=900,rw=cv.width,rh=cv.height,ar=w/boxH;let sw=rw,sh=sw/ar;if(sh>rh){sh=rh;sw=sh*ar}c.drawImage(cv,(rw-sw)/2,(rh-sh)/2,sw,sh,0,top,w,boxH);
+ const j=$('jamo').textContent;if(j){c.font='900 150px "Black Han Sans","Noto Sans CJK KR",sans-serif';c.textAlign='right';c.lineWidth=8;c.strokeStyle='#0d0d0d';c.strokeText(j,w-36,320);c.fillStyle='#ff2bb3';c.fillText(j,w-36,320)}
+ c.textAlign='center';c.fillStyle='#0d0d0d';c.font='700 40px "Gaegu","Noto Sans CJK KR",cursive';const a=[...subText],line=a.slice(Math.max(0,subI-14),Math.max(0,subI-14)+24).join('');c.fillText(line,w/2,1150);c.font='700 26px "Gaegu","Noto Sans CJK KR",sans-serif';c.fillStyle='#6c6c64';c.fillText(location.host,w/2,1240)}
+function startRec(){const type=pickType();if(!type||!HTMLCanvasElement.prototype.captureStream){$('msg').textContent='이 브라우저는 영상 저장을 지원하지 않아요. 크롬이나 사파리 최신 버전에서 시도해 주세요.';$('msg').className='err';return false}
+ const c=document.createElement('canvas');c.width=VW;c.height=VH;const AC=window.AudioContext||window.webkitAudioContext,ax=new AC(),dest=ax.createMediaStreamDestination(),stream=c.captureStream(30);
+ rec={c,g:c.getContext('2d'),ax,dest,chunks:[],type,stream};dprLock=2;size();return true}
+function beginRec(pcm){const b=rec.ax.createBuffer(1,pcm.length,SR);b.copyToChannel(pcm,0);const s=rec.ax.createBufferSource();s.buffer=b;s.connect(rec.dest);const tracks=[...rec.stream.getVideoTracks(),...rec.dest.stream.getAudioTracks()],st=new MediaStream(tracks),mr=new MediaRecorder(st,{mimeType:rec.type,videoBitsPerSecond:4e6,audioBitsPerSecond:128e3});rec.mr=mr;mr.ondataavailable=e=>{if(e.data.size)rec.chunks.push(e.data)};mr.onstop=saveRec;drawFrame();mr.start(250);s.start();$('record').dataset.on='1';$('record').textContent='녹화 중'}
+function stopRec(){if(rec&&rec.mr&&rec.mr.state==='recording')setTimeout(()=>{if(rec&&rec.mr.state==='recording')rec.mr.stop()},350);else if(rec&&!rec.mr)endRec()}
+function endRec(){if(!rec)return;rec.ax.close();rec=null;dprLock=0;size();const b=$('record');b.dataset.on='0';b.textContent='영상 저장'}
+async function saveRec(){const r=rec,ext=r.type.includes('mp4')?'mp4':'webm',blob=new Blob(r.chunks,{type:r.type.split(';')[0]}),name=`jujungi-dance.${ext}`;endRec();if(!blob.size){$('msg').textContent='영상을 만들지 못했어요. 다시 시도해 주세요.';$('msg').className='err';return}
+ const file=new File([blob],name,{type:blob.type});if(/Mobi|Android|iPhone|iPad/.test(navigator.userAgent)&&navigator.canShare&&navigator.canShare({files:[file]})){$('msg').textContent='영상을 만들었어요. 저장하기를 눌러 주세요.';const s=$('msg');const btn=document.createElement('button');btn.type='button';btn.textContent='영상 저장하기';btn.onclick=()=>navigator.share({files:[file]}).catch(()=>{});s.append(' ',btn);return}
+ const u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download=name;document.body.append(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),6e4);$('msg').textContent=`${ext.toUpperCase()} 영상을 내려받았어요.`}
+$('record').onclick=()=>{if(rec)return;if(play){finish();Dance.stop();FX.stop()}if(!startRec())return;speak(true)};
 function fromLink(){const m=location.hash.match(/^#d=(.+)/);if(!m)return;try{const d=dec(m[1]);if(typeof d.t==='string')$('say').value=d.t.slice(0,300);if(d.v&&typeof d.v==='object')for(const[k]of SL)if(typeof d.v[k]==='number')voice[k]=clampN(d.v[k],SL.find(x=>x[0]===k)[2],SL.find(x=>x[0]===k)[3]);voice.id='shared';voice.name='친구 목소리';if(Number.isFinite(d.s))seed=d.s|0;$('msg').textContent='친구의 춤이 도착했어요. 주둥이 털기를 누르세요.'}catch(e){$('msg').textContent='공유 링크를 읽지 못했어요.'}}
 function showFound(){const n=Object.keys(SPECIALS).length;$('found').textContent=found.size?`숨은 단어 ${n}개 중 ${found.size}개 발견`:`숨은 단어가 ${n}개 있습니다. 찾아보세요.`}
 $('f').addEventListener('submit',e=>{e.preventDefault();speak()});

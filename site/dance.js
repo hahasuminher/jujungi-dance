@@ -28,14 +28,11 @@ const CONS_MOVES=[
  ['만세 삼창',(t,P)=>{P.al=P.ar=2.7+.35*s(t*24);P.ll=P.lr=.25}],
  ['문어발 발작',(t,P)=>{P.bl=2.8*s(t*17);P.br=2.8*s(t*17+1);P.kl=2.2*s(t*15+2);P.kr=2.2*s(t*15)}],
  ['고무팔 펀치',(t,P)=>{P.al=P.ar=1.35;P.sl=1+1.7*ab(s(t*11));P.sr=1+1.7*ab(c(t*11))}],
- ['다리 찢기',(t,P)=>{P.ll=P.lr=1.42;P.ry+=.17;P.al=P.ar=1.3}],
- ['제자리 전력질주',(t,P)=>{const a=s(t*26);P.ll=1.15*a;P.lr=-1.15*a;P.kl=1.1;P.kr=1.1;P.al=-a;P.ar=a;P.bl=P.br=1.6}],
  ['게걸음',(t,P)=>{P.ll=P.lr=.95;P.kl=P.kr=-2.1;P.al=P.ar=1.5;P.bl=P.br=2.1;P.rx+=.25*s(t*9);P.ry+=.1}],
  ['치실 댄스',(t,P)=>{const a=s(t*19);P.al=.75+.85*a;P.ar=.75-.85*a;P.rx+=.09*a;P.ll=.2*a;P.lr=-.2*a}],
  ['뒤돌려차기',(t,P)=>{P.ll=2.3*Math.max(0,s(t*13));P.lr=2.3*Math.max(0,-s(t*13));P.ry+=-.05}],
  ['닭 날개',(t,P)=>{P.al=P.ar=.95;P.bl=P.br=-2.5+.7*s(t*31)}],
  ['셀프 싸대기',(t,P)=>{P.al=2.05;P.bl=2.6+.7*s(t*25);P.ar=.2;P.br=.5*s(t*25)}],
- ['다리 헬리콥터',(t,P)=>{P.ll=t*19;P.lr=t*19+PI;P.ry+=-.26;P.al=P.ar=1.5}],
  ['오징어춤',(t,P)=>{P.al=1.3+s(t*13);P.ar=1.3+s(t*13+1.5);P.ll=.8+.6*s(t*13+3);P.lr=.8+.6*s(t*13+4.5);P.bl=P.kl=2*s(t*9);P.br=P.kr=-2*s(t*9)}],
  ['개구리 점프',(t,P)=>{const h=ab(s(t*13));P.ry+=-.36*h;P.ll=P.lr=.5+.8*(1-h);P.kl=P.kr=2.5*(1-h);P.al=P.ar=2.4*h}],
  ['고장난 로봇',(t,P)=>{const q=Math.floor(t*9);P.al=(q*2.3)%3;P.ar=(q*1.1)%3;P.ll=(q%3)*.35;P.lr=((q+1)%3)*.35;P.bl=(q%2)*1.57;P.br=((q+1)%2)*1.57}],
@@ -48,12 +45,13 @@ const CONS_MOVES=[
  ['양팔 빨래 짜기',(t,P)=>{P.al=P.ar=1.45;P.bl=3.2*s(t*20);P.br=-3.2*s(t*20)}],
 ];
 const VOW_MOVES=[
+ ['상체 스프링',(t,P)=>{const q=s(t*20);P.sy=1+.14*q;P.ry+=-.07*Math.max(0,q);P.bd=.25*c(t*20)}],
+ ['트위스트',(t,P)=>{P.tw=.9*s(t*17);P.bd=-.5*s(t*17);P.rx+=.08*c(t*17)}],
  ['머리 승천',(t,P)=>{P.hy=-.42-.08*s(t*20)}],
  ['호떡 되기',(t,P)=>{P.sx=1.75;P.sy=.42;P.ry+=.16}],
  ['멸치 되기',(t,P)=>{P.sx=.42;P.sy=1.42}],
  ['대왕 머리',(t,P)=>{P.hs=2.5+.3*s(t*18)}],
  ['콩알 머리',(t,P)=>{P.hs=.32;P.hy=.02}],
- ['통째로 회전',(t,P)=>{P.rr=t*15}],
  ['지렁이',(t,P)=>{P.bd=.75*s(t*15);P.tw=.3*c(t*15)}],
  ['림보 꺾기',(t,P)=>{P.bd=1.15;P.hr=-1;P.rx+=-.1}],
  ['목 360도',(t,P)=>{P.hr=t*21}],
@@ -62,8 +60,6 @@ const VOW_MOVES=[
  ['부들부들',(t,P)=>{P.rx+=.025*s(t*93);P.ry+=.02*s(t*77);P.sy=.93}],
  ['분신술',(t,P)=>{P.clones=1;P.rr=.12*s(t*12)}],
  ['잔상 남기기',(t,P)=>{P.ghost=1;P.rx+=.33*s(t*11)}],
- ['물구나무',(t,P)=>{P.rr=PI;P.sy=.98+.1*s(t*24)}],
- ['뻗어버리기',(t,P)=>{P.rr=PI/2;P.ry+=.2;P.rx+=.05*s(t*30)}],
  ['엉덩이 씰룩',(t,P)=>{P.tw=.75*s(t*26);P.bd=.2*s(t*13)}],
  ['고개만 쭉',(t,P)=>{P.hx=.32*s(t*10);P.hy=-.08}],
  ['문워크',(t,P)=>{P.rx+=.4*s(t*5);P.rr=-.25*c(t*5)}],
@@ -82,7 +78,11 @@ const WHOLE=(()=>{const t2=TAU,ff=[A,widen(E,1.25),hk(A,2),widen(Em,1.25)],s=Mat
  {n:'긴 목',dur:.45,pose:()=>DD},{n:'갸우뚱',dur:.42,pose:()=>C},{n:'반대 갸우뚱',dur:.42,pose:()=>Cm},{n:'뒤집기',dur:.55,pose:()=>F},
  {n:'브릿지',dur:.6,f:(t,P)=>{P.rr=2.9;P.bd=1.1;P.ry=.08;P.kl=P.kr=1.2;P.al=P.ar=2.6}},{n:'큰절',dur:.6,f:(t,P)=>{P.rr=1.3;P.kl=P.kr=2.2;P.ry=.17;P.al=P.ar=2.7}},{n:'벌러덩',dur:.6,f:(t,P)=>{P.rr=-1.5;P.ry=.2;P.ll=.8+.5*s(t*20);P.lr=.8-.5*s(t*20)}},
  {n:'트월킹',dur:.55,f:(t,P)=>{P.tw=.95*s(t*30);P.bd=.55;P.kl=P.kr=1.4;P.ry=.1;P.rr=.3}},{n:'전력질주',dur:.55,f:(t,P)=>{const a=s(t*26);P.ll=1.2*a;P.lr=-1.2*a;P.kl=P.kr=1.1;P.al=-a;P.ar=a;P.bl=P.br=1.6;P.rr=.2;P.bd=-.4}},
- {n:'다리 헬기',dur:.6,f:(t,P)=>{P.ll=t*19;P.lr=t*19+PIm;P.ry=-.26;P.al=P.ar=1.5}}]})();
+ {n:'다리 헬기',dur:.6,f:(t,P)=>{P.ll=t*19;P.lr=t*19+PIm;P.ry=-.26;P.al=P.ar=1.5}},
+ {n:'슬라이딩',dur:.5,f:(t,P)=>{P.rx=-.38+t*1.5;P.rr=-.55;P.ll=1.1;P.kl=.1;P.kr=2;P.al=2.6;P.ar=.5}},{n:'회전 점프',dur:.5,f:(t,P)=>{P.rr=t*TAU/.5;P.ry=-.36*s(t*6.28);P.al=P.ar=2.7}},{n:'공중제비',dur:.5,f:(t,P)=>{P.rr=-t*TAU/.5;P.ry=-.42*s(t*6.28);P.kl=P.kr=2.3;P.ll=P.lr=-.3;P.al=P.ar=.4;P.bl=P.br=2}},
+ {n:'연속 구르기',dur:.6,f:(t,P)=>{P.rr=t*22;P.rx=-.38+t*1.3;P.ry=.08;P.kl=P.kr=2.4;P.ll=P.lr=-.4;P.al=P.ar=.3;P.bl=P.br=2.2}},{n:'코사크',dur:.55,f:(t,P)=>{const a=s(t*24)>0;P.ry=.16;P.ll=a?1.2:.1;P.kl=a?.1:2.3;P.lr=a?.1:1.2;P.kr=a?2.3:.1;P.al=P.ar=1.45;P.bl=P.br=1.9}},
+ {n:'말 타기',dur:.55,f:(t,P)=>{P.ry=.1-.1*Math.abs(s(t*16));P.ll=P.lr=.8;P.kl=P.kr=1.9;P.ar=2.6;P.br=t*30;P.al=1;P.bl=1.8;P.rx=.15*s(t*8)}},{n:'스핀 킥',dur:.5,f:(t,P)=>{P.rr=t*19;P.ll=1.5;P.kl=0;P.lr=.05;P.al=P.ar=1.4;P.ry=-.08}},
+ {n:'배치기',dur:.45,f:(t,P)=>{const q=s(t*7);P.bd=-1.2*q;P.rx=.22*q;P.al=P.ar=.2;P.hr=-.4*q}},{n:'곤두박질',dur:.55,f:(t,P)=>{P.rr=PIm*Math.min(1,t*4);P.ry=-.3+t*.7;P.ll=P.lr=.7;P.al=P.ar=2.7}},{n:'벽 튕기기',dur:.5,f:(t,P)=>{const q=s(t*12.5);P.rx=.36*q;P.rr=.5*q;P.kl=P.kr=1.2;P.al=P.ar=2.2}}]})();
 let mapW={};
 let rnd=Math.random,mapC={},mapV={};
 function reseed(seed){let a=seed>>>0;rnd=()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};const sh=x=>{x=[...x];for(let i=x.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x};const mc=sh(CONS_MOVES),mv=sh(VOW_MOVES),mw=sh(WHOLE);JUNG.forEach((j,i)=>mapW[j]=mw[i%mw.length]);CHO.forEach((j,i)=>mapC[j]=mc[i]);JUNG.forEach((j,i)=>mapV[j]=mv[i])}
@@ -137,9 +137,9 @@ const wrap=a=>{a=(a+PIm)%TAU;return a<0?a+TAU-PIm:a-PIm};
 function setTarget(p,o={}){T.body=p.body;T.head=p.head;T.rot=p.rot;T.cel=p.cel;T.mir=p.mir;if(p.head.k!==hkB||!!p.head.flip!==hfB){hkA=hkU<.5?hkA:hkB;hfA=hkU<.5?hfA:hfB;hkB=p.head.k;hfB=!!p.head.flip;hkU=0}
  if(o.snap){R.dx=o.dx??R.dx;R.dy=o.dy??R.dy;R.vx=R.vy=0}if(o.dx!==undefined)T.dx=o.dx;if(o.dy!==undefined)T.dy=o.dy;cloneOn=o.clones?1:0;orbit=o.orbit?1:0;if(o.mouth)mouthExtra=o.mouth}
 T.dx=0;T.dy=0;
-function stepBody(dt){const h=dt/2;for(let n=0;n<2;n++)for(let i=0;i<M*2;i++){const w=seg[i>>1],k=lerp(460,240,w),c=2*Math.sqrt(k)*.5;V0[i]+=((T.body[i]-X[i])*k-V0[i]*c)*h;X[i]+=V0[i]*h}
- let da=T.head.ang-H.ang;while(da>PIm)da-=TAU;while(da<-PIm)da+=TAU;const kk=420,cc=2*Math.sqrt(kk)*.6;H.vx+=((T.head.x-H.x)*kk-H.vx*cc)*dt;H.x+=H.vx*dt;H.vy+=((T.head.y-H.y)*kk-H.vy*cc)*dt;H.y+=H.vy*dt;H.va+=(da*kk-H.va*cc)*dt;H.ang+=H.va*dt;H.vs+=((T.head.s-H.s)*kk-H.vs*cc)*dt;H.s+=H.vs*dt;
- const kr=orbit?70:300,cr=2*Math.sqrt(kr)*.75;R.v+=((T.rot-R.rot)*kr-R.v*cr)*dt;R.rot+=R.v*dt;const kd=120,cd=2*Math.sqrt(kd)*.8;R.vx+=((T.dx-R.dx)*kd-R.vx*cd)*dt;R.dx+=R.vx*dt;R.vy+=((T.dy-R.dy)*kd-R.vy*cd)*dt;R.dy+=R.vy*dt;
+function stepBody(dt){const h=dt/2;for(let n=0;n<2;n++)for(let i=0;i<M*2;i++){const w=seg[i>>1],k=lerp(820,420,w),c=2*Math.sqrt(k)*.48;V0[i]+=((T.body[i]-X[i])*k-V0[i]*c)*h;X[i]+=V0[i]*h}
+ let da=T.head.ang-H.ang;while(da>PIm)da-=TAU;while(da<-PIm)da+=TAU;const kk=680,cc=2*Math.sqrt(kk)*.55;H.vx+=((T.head.x-H.x)*kk-H.vx*cc)*dt;H.x+=H.vx*dt;H.vy+=((T.head.y-H.y)*kk-H.vy*cc)*dt;H.y+=H.vy*dt;H.va+=(da*kk-H.va*cc)*dt;H.ang+=H.va*dt;H.vs+=((T.head.s-H.s)*kk-H.vs*cc)*dt;H.s+=H.vs*dt;
+ const kr=orbit?70:560,cr=2*Math.sqrt(kr)*.7;R.v+=((T.rot-R.rot)*kr-R.v*cr)*dt;R.rot+=R.v*dt;const kd=120,cd=2*Math.sqrt(kd)*.8;R.vx+=((T.dx-R.dx)*kd-R.vx*cd)*dt;R.dx+=R.vx*dt;R.vy+=((T.dy-R.dy)*kd-R.vy*cd)*dt;R.dy+=R.vy*dt;
  hkU=Math.min(1,hkU+dt*8);mouth=Math.max(0,mouth-dt*7);mouthExtra=Math.max(0,mouthExtra-dt*1.6)}
 const wob=(i,s0)=>Math.sin(i*.35+s0)*1.4+Math.sin(i*.13+s0*1.7)*1.4;
 function headPoly(){const fp=(p,f)=>f?p.map((q,i)=>{const r=p[(72-i)%72];return[-r[0],r[1]]}):p,a=fp(polyOf(hkA).p,hfA&&hkA===1),b=fp(polyOf(hkB).p,hfB&&hkB===1);if(hkU>=1||hkA===hkB)return b;const t=hkU;return a.map((p,i)=>[p[0]+(b[i][0]-p[0])*t,p[1]+(b[i][1]-p[1])*t])}
@@ -156,13 +156,14 @@ function draw(g,ox,oy,S,tick,raster){const sd=tick*2.1;const lw=2.6/S*Math.min(1
  g.restore();g.restore()}
 /* 평소 춤: 뼈대 자세를 윤곽 목표로 삼아 탄력 있게 따라간다. 전신 동작을 덮어 쓴다 */
 let curC=null,curV=null,curW=null,tC=0,tV=0,tW=0,wCool=0,fxv={ex:0,q:0,til:0,dots:false},ghostOn=0,trail=[];
+const recent=[],shuffle2=x=>{x=[...x];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x};
 const ARM=['al','ar','bl','br','sl','sr'],SOFT=['hr','hx','hy','hs'];
 const IDLE={...A,cel:null};
-function liveTarget(dt,now){tC+=dt;tV+=dt;if(curW){tW+=dt;if(tW>=curW.dur){curW=null;wCool=.14;R.rot=wrap(R.rot)}}else wCool=Math.max(0,wCool-dt);
+function liveTarget(dt,now){tC+=dt;tV+=dt;if(curW){tW+=dt;if(tW>=curW.dur){curW=null;wCool=.04;R.rot=wrap(R.rot)}}else wCool=Math.max(0,wCool-dt);
  if(curW&&curW.pose){setTarget(curW.pose(tW));return}
  if(!curC&&!curV&&!curW){setTarget(IDLE);cloneOn=0;ghostOn=0;return}
  const P={...REST},Q={...REST};if(curC)curC[1](tC,Q);if(curV)curV[1](tV,Q);
- if(curW){curW.f(tW,P);for(const k of ARM)P[k]=P[k]+(Q[k]-REST[k])*.6;for(const k of SOFT)P[k]=P[k]+(Q[k]-REST[k])*.5}else Object.assign(P,Q);
+ if(curW){curW.f(tW,P);for(const k of ARM)P[k]=P[k]+(Q[k]-REST[k])*.6;for(const k of SOFT)P[k]=P[k]+(Q[k]-REST[k])*.5}else{Object.assign(P,Q);for(const k of['al','ar','bl','br','ll','lr','kl','kr','bd','tw','rx','ry','hx','hy','hr'])P[k]*=1.3}
  const a=1+.16*Math.min(5,fxv.ex);for(const k of['al','ar','bl','br','ll','lr','kl','kr','hr','bd','tw','rx','ry','hy','hx'])P[k]*=a;P.hs*=1+.08*Math.min(5,fxv.ex);
  if(fxv.q)P.hr+=Math.sin(now/55)*.3*Math.min(3,fxv.q);if(fxv.til){P.tw+=Math.sin(now/170)*.6;P.bd+=Math.cos(now/170)*.5}if(fxv.dots){P.ry+=.03;P.al*=.3;P.ar*=.3;P.hy+=.03}
  cloneOn=P.clones>.5?1:0;ghostOn=P.ghost>.5?1:0;const c=capture({...P,rr:0,clones:0,ghost:0});c.rot=P.rr;setTarget(c)}
@@ -172,8 +173,8 @@ return{setImages(i){Object.assign(IMG,i)},reseed,
  update(dt,now){if(bigSeq){bigT+=dt/BEAT;while(bigI<bigSeq.length&&bigSeq[bigI][0]<=bigT){const[,p,o]=bigSeq[bigI];setTarget(p,o||{dx:T.dx,dy:T.dy});bigI++}if(bigT>=16.1){bigSeq=null;cloneOn=0;orbit=0;endBig()}}else liveTarget(dt,now);stepBody(dt);let e=0;for(let i=0;i<M*2;i+=11)e+=Math.abs(X[i]-T.body[i]);settled=!!bigSeq&&e/(M*2/11)<2.4&&Math.abs(H.x-T.head.x)<3&&hkU>=1&&Math.abs(wrap(R.rot-T.rot))<.02},
  render(g,W,Ht,S,ox,oy,tick,calm,accent){const orb=orbit?[Math.cos(now2()/500)*W*.05,Math.sin(now2()/500)*Ht*.04]:[0,0];drawTrail(g,ox,oy,S,accent);if(cloneOn){draw(g,ox-W*.31,oy+Ht*.12,S*.62,tick,false);draw(g,ox+W*.31,oy+Ht*.12,S*.62,tick,false)}draw(g,ox+orb[0],oy+orb[1],S,tick,true)},
  eyes(W,Ht,S,ox,oy){const px=(H.x-CXs)*S,py=(H.y-CYs)*S,cr=Math.cos(R.rot),sr=Math.sin(R.rot),c0=[ox+R.dx*H_U*S+px*cr-py*sr,oy+R.dy*H_U*S+px*sr+py*cr],a=H.ang+R.rot,e=HH*H.s*S;return[-1,1].map(q=>[c0[0]+Math.cos(a)*q*e*.19-Math.sin(a)*-.03*e,c0[1]+Math.sin(a)*q*e*.19+Math.cos(a)*-.03*e])},
- event(e){if(bigSeq){if(e.kind==='v')mouth=1;return}fxv={ex:e.ex,q:e.q,til:e.til,dots:e.dots};if(e.kind==='v'){curV=mapV[e.j];tV=0;mouth=/[ㅏㅑㅐㅒㅓㅕㅘ]/.test(e.j)?1:.65;if(!curW&&wCool<=0){curW=mapW[e.j];tW=0;R.rot=wrap(R.rot)}}else{curC=mapC[e.j];tC=0}},
+ event(e){if(bigSeq){if(e.kind==='v')mouth=1;return}fxv={ex:e.ex,q:e.q,til:e.til,dots:e.dots};if(e.kind==='v'){curV=mapV[e.j];tV=0;mouth=/[ㅏㅑㅐㅒㅓㅕㅘ]/.test(e.j)?1:.65;if(!curW&&wCool<=0){let w=mapW[e.j];if(recent.includes(w)){const un=shuffle2(WHOLE.filter(x=>!recent.includes(x)));w=un[0]||w}recent.push(w);if(recent.length>Math.min(18,WHOLE.length-3))recent.shift();curW=w;tW=0;R.rot=wrap(R.rot)}}else{curC=mapC[e.j];tC=0}},
  big(name){const f=BIG[name];if(!f)return false;curC=curV=curW=null;const a=f(),end=Math.min(8,Math.max(...a.map(k=>k[0]))),b=BIG[FINALE[name]]().map(k=>[k[0]+8,k[1],k[2]]);bigSeq=[...a.filter(k=>k[0]<8),...b].sort((x,y)=>x[0]-y[0]);bigT=0;bigI=0;R.rot=wrap(R.rot);return true},
- relax(){curC=curV=curW=null},isBig:()=>!!bigSeq,stop(){if(bigSeq){bigSeq=null;cloneOn=0;orbit=0;endBig()}curC=curV=curW=null},bigBeat:()=>bigT};
+ relax(){curC=curV=curW=null},wholeCount:()=>WHOLE.length,recentList:()=>recent.map(x=>x.n),isBig:()=>!!bigSeq,stop(){if(bigSeq){bigSeq=null;cloneOn=0;orbit=0;endBig()}curC=curV=curW=null},bigBeat:()=>bigT};
 })();
 const IMG={};

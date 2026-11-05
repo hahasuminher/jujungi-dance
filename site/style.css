@@ -25,7 +25,9 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--neon-p);outli
 #go:active{transform:translate(4px,5px);box-shadow:1px 1px 0 var(--ink)}
 #go[data-on="1"]{background:var(--neon-y)}
 #go:disabled{background:var(--line);cursor:wait}
-#share{min-height:64px;padding:0 16px;font-weight:700;font-size:20px;background:var(--neon-y);border:3px solid var(--ink);border-radius:225px 18px 255px 18px/18px 255px 18px 225px}
+#share,#shuffle,#record{flex:1 1 110px;min-height:56px;padding:0 12px;font-weight:700;font-size:20px;background:var(--neon-y);border:3px solid var(--ink);border-radius:225px 18px 255px 18px/18px 255px 18px 225px}
+#record[data-on="1"]{background:var(--neon-p)}
+#record:disabled{background:var(--line);cursor:wait}
 #msg{min-height:1.4em;color:var(--soft);font-weight:700;overflow-wrap:anywhere}
 #msg.err{color:#c4006e}
 details{border-top:3px solid var(--ink);padding-top:8px}
