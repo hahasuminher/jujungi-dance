@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>주둥이 댄스</title>
+<meta name="description" content="아무 말이나 입력하면 무표정한 아저씨가 헬륨 목소리로 외치며 춤을 춥니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=East+Sea+Dokdo&family=Gaegu:wght@400;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <div id="stage">
+    <canvas id="cv" aria-label="입력한 말에 맞춰 춤추는 무표정한 아저씨" role="img"></canvas>
+    <h1>주둥이 <mark>댄스</mark></h1>
+    <div id="jamo" aria-hidden="true"></div>
+    <div id="move" hidden></div>
+    <div id="sub"></div>
+  </div>
+  <form id="f">
+    <label class="say" for="say">아무 말이나 쳐봐. 느낌표!!!를 많이 붙일수록 난리 난다.</label>
+    <textarea id="say" maxlength="300">아 진짜 퇴근하고 싶다!!! 나 왜 이래???</textarea>
+    <div class="row">
+      <button id="go" type="submit" disabled>목 푸는 중</button>
+      <button id="bgm" type="button" aria-pressed="true">둠칫 켬</button>
+      <button id="share" type="button">내 춤 공유</button>
+    </div>
+    <div id="msg" role="status"></div>
+  </form>
+  <details open><summary>아저씨 꾸미기</summary>
+    <div class="dress-tools"><button id="dressRandom" type="button">아무거나 입히기</button><button id="dressClear" type="button">다 벗기기</button></div>
+    <div id="dress" class="grid"></div></details>
+  <details><summary>목소리 만들기</summary>
+    <div id="presets" class="chips"></div>
+    <div id="sliders" class="sliders"></div>
+    <div class="dress-tools"><button id="voiceTest" type="button">들어보기</button><button id="voiceSave" type="button">내 목소리 저장</button></div></details>
+  <details><summary>문장부호 사용법</summary>
+    <dl class="punct"><dt>!!!</dt><dd>많이 붙일수록 높고 거칠게 외칩니다.</dd><dt>???</dt><dd>끝이 올라가고 고개를 흔듭니다.</dd><dt>~~~</dt><dd>끝을 늘이고 몸을 꼬아댑니다.</dd><dt>...</dt><dd>힘이 빠지고 축 처집니다.</dd></dl></details>
+  <p class="found" id="found"></p>
+  <footer>음성 합성: <a href="https://github.com/espeak-ng/espeak-ng">eSpeak NG</a> (GPL-3.0). 이 사이트의 <a href="https://github.com/hahasuminher/jujungi-dance">소스 코드</a>는 GPL-3.0으로 공개되어 있습니다. 혼자 모드의 입력은 브라우저 안에서만 처리됩니다.</footer>
+</div>
+<script src="boot.js"></script>
+</body>
+</html>
