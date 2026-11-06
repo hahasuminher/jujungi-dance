@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-visual">
 <title>주둥이 댄스</title>
-<meta name="description" content="아무 말이나 입력하면 무표정한 아저씨가 헬륨 목소리로 외치며 춤을 춥니다.">
+<meta name="description" content="아무 말이나 입력하면 무표정한 주둥이가 헬륨 목소리로 외치며 춤을 춥니다.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=East+Sea+Dokdo&family=Gaegu:wght@400;700&display=swap">
 <link rel="stylesheet" href="style.css">
@@ -12,19 +12,20 @@
 <body>
 <div class="wrap">
   <div id="stage">
-    <canvas id="cv" aria-label="입력한 말에 맞춰 춤추는 무표정한 아저씨" role="img"></canvas>
+    <canvas id="cv" aria-label="입력한 말에 맞춰 춤추는 무표정한 주둥이" role="img"></canvas>
     <h1>주둥이 <mark>댄스</mark></h1>
     <div id="jamo" aria-hidden="true"></div>
     <div id="sub"></div>
   </div>
   <form id="f">
+    <p id="tag">광장에서 다른 사람들과 같이 놀아요.</p>
+    <button id="enter" type="button">광장 입장</button>
+    <button id="friend" type="button">친구 광장 <small>코드로 친구끼리 놀아요</small></button>
+    <div id="friendBox" hidden><button id="fMake" type="button">새 친구 광장 만들기</button><div class="row"><input id="fCode" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="입장 코드 5자리" aria-label="입장 코드"><button id="fJoin" type="button">입장</button></div></div>
     <textarea id="say" maxlength="300" aria-label="하고 싶은 말">이 곳에 하고 싶은 말을 입력해 보세요~~</textarea>
     <div class="row">
       <button id="go" type="submit" disabled>목 푸는 중</button>
     </div>
-    <button id="enter" type="button">광장 입장</button>
-    <button id="friend" type="button">친구 광장</button>
-    <div id="friendBox" hidden><button id="fMake" type="button">새 친구 광장 만들기</button><div class="row"><input id="fCode" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="입장 코드 5자리" aria-label="입장 코드"><button id="fJoin" type="button">입장</button></div></div>
     <div class="row sub-row">
       <button id="record" type="button">영상 저장</button>
       <button id="share" type="button">사이트 공유</button>
@@ -47,6 +48,7 @@
   <div id="clubOpen" class="pop" hidden><strong>주둥이 클럽 열기</strong><label for="clubIn">클럽에서 반복할 말</label><input id="clubIn" maxlength="30" placeholder="30자까지, 비속어 금지" autocomplete="off"><div id="clubThemes" class="chips"><button class="chip" type="button" data-t="edm" aria-pressed="true">EDM</button><button class="chip" type="button" data-t="hiphop" aria-pressed="false">힙합</button><button class="chip" type="button" data-t="disco" aria-pressed="false">디스코</button><button class="chip" type="button" data-t="trot" aria-pressed="false">트로트</button></div><div class="pop-row"><button id="clubGo" type="button">초대 보내기</button><button id="clubCancel" type="button">닫기</button></div></div>
   <div id="clubInvite" class="pop" hidden><strong>클럽 초대장</strong><span id="clubText"></span><div class="pop-row"><button id="clubYes" type="button">입장</button><button id="clubNo" type="button">거절</button></div></div>
   <button id="clubExit" type="button">클럽 나가기</button>
+  <button id="soundTap" type="button" hidden>화면을 눌러 소리 켜기</button>
   <button id="aSing" type="button" hidden>노래하기</button>
   <button id="aPick" type="button" hidden></button>
   <div id="singOpen" class="pop" hidden><strong>주둥이 노래방</strong><div id="singSongs" class="chips"></div><small id="singBy"></small><div id="singMode" class="chips"><button class="chip" type="button" data-m="orig" aria-pressed="true">원래 가사</button><button class="chip" type="button" data-m="mine" aria-pressed="false">내 가사</button></div><div id="singLyr" hidden><label for="singIn">가사 (짧으면 곡이 끝날 때까지 반복)</label><textarea id="singIn" maxlength="120" rows="3"></textarea></div><div class="pop-row"><button id="singGo" type="button">노래 시작</button><button id="singCancel" type="button">닫기</button></div></div>

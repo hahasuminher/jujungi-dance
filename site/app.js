@@ -73,7 +73,7 @@ $('f').addEventListener('submit',e=>{e.preventDefault();speak()});
 $('say').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('f').requestSubmit()}});
 $('say').addEventListener('focus',e=>{if(e.target.value===e.target.defaultValue)e.target.select()});fromLink();Dance.reseed(seed);drawVoice();Plaza.init(cv);
 (async()=>{await Promise.all([...'ABCDEFGHIJKLMOQRS'].map(k=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[k]=i;r()};i.onerror=r;i.src=`assets/${k}.png`})));
- try{await bootVoice();startSynth()}catch(e){console.warn(e);$('msg').textContent='웃긴 목소리를 불러오지 못해서 기기 기본 목소리로 말합니다.';$('msg').className='err'}
+ try{await bootVoice();startSynth();setTimeout(()=>Plaza.resume(),0)}catch(e){console.warn(e);$('msg').textContent='웃긴 목소리를 불러오지 못해서 기기 기본 목소리로 말합니다.';$('msg').className='err'}
  $('go').disabled=false;$('go').textContent='주둥이 털기'})();
 if(document.fonts)document.fonts.load('400 60px "East Sea Dokdo"',Object.keys(SPECIALS).join('')+'!').catch(()=>{});
 requestAnimationFrame(loop);

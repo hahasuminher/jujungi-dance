@@ -20,7 +20,7 @@ form{display:flex;flex-direction:column;gap:12px}
 .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 button{font:inherit;color:var(--ink);cursor:pointer}
 button:focus-visible,summary:focus-visible{outline:3px solid var(--neon-p);outline-offset:3px}
-#go{flex:1 1 220px;min-height:64px;font-family:var(--stamp);font-size:28px;background:var(--neon-p);border:3px solid var(--ink);border-radius:18px 225px 18px 255px/255px 18px 225px 18px;box-shadow:5px 6px 0 var(--ink);transform:rotate(-1deg)}
+#go{flex:1 1 220px;min-height:56px;font-family:var(--stamp);font-size:24px;background:var(--neon-p);border:3px solid var(--ink);border-radius:18px 225px 18px 255px/255px 18px 225px 18px;box-shadow:5px 6px 0 var(--ink);transform:rotate(-1deg)}
 #go:active{transform:translate(4px,5px);box-shadow:1px 1px 0 var(--ink)}
 #go[data-on="1"]{background:var(--neon-y)}
 #go:disabled{background:var(--line);cursor:wait}
@@ -39,7 +39,7 @@ summary{font-family:var(--stamp);font-size:24px;cursor:pointer}
 .sliders input{accent-color:var(--neon-p);width:100%}
 footer{color:var(--soft);font-size:15px;margin-top:8px}footer a{color:inherit}
 @media(prefers-reduced-motion:reduce){h1,#go{transform:none}}
-#enter{min-height:64px;font-family:var(--stamp);font-size:28px;color:#fff;background:#2b6cff;border:3px solid var(--ink);border-radius:18px 225px 18px 255px/255px 18px 225px 18px;box-shadow:5px 6px 0 var(--ink);transform:rotate(.6deg)}
+#enter{min-height:78px;font-family:var(--stamp);font-size:34px;color:#fff;background:#2b6cff;border:3px solid var(--ink);border-radius:18px 225px 18px 255px/255px 18px 225px 18px;box-shadow:5px 6px 0 var(--ink);transform:rotate(.6deg)}
 #enter:active{transform:translate(4px,5px);box-shadow:1px 1px 0 var(--ink)}
 #enter[data-on="1"]{background:var(--ink);color:var(--neon-y)}
 .rule{margin:8px 0 0;font-weight:700;max-width:65ch}
@@ -97,3 +97,6 @@ body.typing #dock{padding-bottom:8px}
 #singMode{margin-top:2px;gap:6px}#singLyr{display:flex;flex-direction:column;gap:6px}#singLyr[hidden]{display:none}
 #friend{min-height:48px;font-weight:700;background:var(--paper);border:3px solid var(--ink);border-radius:18px 225px 18px 255px/255px 18px 225px 18px}
 #friendBox{display:flex;flex-direction:column;gap:8px}#friendBox[hidden]{display:none}#friendBox button{min-height:46px;font-weight:700;background:var(--neon-y);border:2px solid var(--ink);border-radius:10px;padding:0 16px}#friendBox .row{display:flex;gap:8px}#fCode{flex:1;min-width:0;padding:8px 10px;font:inherit;font-weight:700;text-transform:uppercase;border:3px solid var(--ink);border-radius:10px}
+#tag{margin:0;font-weight:700;font-size:18px;text-align:center}
+#friend small{font-size:15px;font-weight:400;margin-left:6px}
+#soundTap{position:fixed;z-index:7;left:50%;top:calc(66px + env(safe-area-inset-top,0px));transform:translateX(-50%);padding:9px 18px;font-weight:700;color:#fff;background:var(--ink);border:0;border-radius:10px;white-space:nowrap}#soundTap[hidden]{display:none}
