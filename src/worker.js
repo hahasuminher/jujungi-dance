@@ -1,17 +1,17 @@
 /* 주둥이 댄스 광장 서버: 방마다 최대 30명 */
 import {DurableObject} from 'cloudflare:workers';
 import {check} from './filter.js';
-const MAX=20,FRIEND_MAX=12,MAX_ROOMS=40,BAN_MS=30*60*1000,REPORTS=3,WORLD=1400,MIC={x:700,y:700,r:120},REACT=['ㅋㅋㅋ','박수','야유','하트'],CLUB_MS=60000,CLUB_COOL=3600*1000,BAT_MS=30000,KINDS=['bat','ham'],EACH=2,SONG_IDS=['star','lamb','bell','joy','can','trot'],THEMES=['edm','hiphop','disco','trot'];
+const MAX=20,FRIEND_MAX=12,MAX_ROOMS=40,BAN_MS=30*60*1000,REPORTS=3,WORLD=1400,MIC={x:700,y:700,r:120},REACT=['ㅋㅋㅋ','박수','야유','하트'],CLUB_MS=60000,CLUB_COOL=3600*1000,BAT_MS=30000,BOMB_BACK=300000,KINDS=['bat','ham'],EACH=2,SONG_IDS=['star','lamb','bell','joy','can','trot'],THEMES=['edm','hiphop','disco','trot'];
 const num=(v,a,b,d)=>typeof v==='number'&&isFinite(v)?Math.max(a,Math.min(b,v)):d;
 const cleanVoice=v=>({pitch:num(v?.pitch,0,99,85),rate:num(v?.rate,80,300,135),range:num(v?.range,0,99,90),speed:num(v?.speed,.6,1.9,1.32),wobble:num(v?.wobble,0,1,0),robot:num(v?.robot,0,.9,0)});
 export class Room extends DurableObject{
- constructor(ctx,env){super(ctx,env);this.bananas=[];this.bats=[];this.batBack=[];this.tramp=[];this.bomb=null;this.bombBy=0;this.bombLast=0;this.bombT=0;this.singNo=0;this.singUntil=0;this.recent=[];ctx.blockConcurrencyWhile(async()=>{const v=await ctx.storage.get('world');if(v)Object.assign(this,v)});ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('ping','pong'))}
- save(){return this.ctx.storage.put('world',{bananas:this.bananas,bats:this.bats,batBack:this.batBack,tramp:this.tramp,bomb:this.bomb,bombBy:this.bombBy,bombLast:this.bombLast,bombT:this.bombT,singNo:this.singNo,singUntil:this.singUntil})}
+ constructor(ctx,env){super(ctx,env);this.bananas=[];this.bats=[];this.batBack=[];this.tramp=[];this.bomb=null;this.bombBy=0;this.bombNext=0;this.bombLast=0;this.bombT=0;this.singNo=0;this.singUntil=0;this.recent=[];ctx.blockConcurrencyWhile(async()=>{const v=await ctx.storage.get('world');if(v)Object.assign(this,v)});ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('ping','pong'))}
+ save(){return this.ctx.storage.put('world',{bananas:this.bananas,bats:this.bats,batBack:this.batBack,tramp:this.tramp,bomb:this.bomb,bombBy:this.bombBy,bombNext:this.bombNext,bombLast:this.bombLast,bombT:this.bombT,singNo:this.singNo,singUntil:this.singUntil})}
  bombAt(){for(let g=0;g<30;g++){const x=Math.round(150+Math.random()*1100),y=Math.round(180+Math.random()*1040);if(Math.hypot(x-MIC.x,y-MIC.y)>200)return{x,y}}return{x:300,y:300}}
  bombState(){this.save();this.all({type:'bomb',b:this.bomb,by:this.bombBy})}
- async alarm(){if(!this.bombBy)return;const no=this.bombBy,w=this.peers().find(x=>x.deserializeAttachment()?.no===no),a=w&&w.deserializeAttachment();this.bombBy=0;this.bomb=this.bombAt();if(a)this.all({type:'boom',no,x:a.x,y:a.y});this.bombState()}
+ async alarm(){if(!this.bombBy){if(!this.bomb){this.bomb=this.bombAt();this.bombNext=0;this.bombState()}return}const no=this.bombBy,w=this.peers().find(x=>x.deserializeAttachment()?.no===no),a=w&&w.deserializeAttachment();this.bombBy=0;this.bomb=null;this.bombNext=Date.now()+BOMB_BACK;await this.ctx.storage.setAlarm(this.bombNext);if(a)this.all({type:'boom',no,x:a.x,y:a.y});this.bombState()}
  tramps(){const o=[];let g=0;while(o.length<2&&g++<80){const x=200+Math.random()*1000,y=220+Math.random()*960;if(Math.hypot(x-MIC.x,y-MIC.y)<290||o.some(q=>Math.hypot(q[0]-x,q[1]-y)<360))continue;o.push([Math.round(x),Math.round(y)])}return o}
- tick(){if(this.fillBats()){this.save();this.all({type:'bats',list:this.bats,tramp:this.tramp})}if(!this.bomb&&!this.bombBy){this.bomb=this.bombAt();this.bombState()}}
+ tick(){if(this.fillBats()){this.save();this.all({type:'bats',list:this.bats,tramp:this.tramp})}if(!this.bomb&&!this.bombBy&&this.bombNext<=Date.now()){this.bomb=this.bombAt();this.bombNext=0;this.bombState()}}
  batAt(k){return{id:crypto.randomUUID().slice(0,6),k,x:150+Math.random()*1100,y:200+Math.random()*1000}}
  fillBats(){const now=Date.now();let ch=false;let back=false;this.batBack=this.batBack.filter(b=>{if(b.t>now)return true;this.bats.push(this.batAt(b.k));ch=true;back=true;return false});if(back||!this.tramp.length){this.tramp=this.tramps();ch=true}for(const k of KINDS){while(this.bats.filter(b=>b.k===k).length+this.batBack.filter(b=>b.k===k).length<EACH){this.bats.push(this.batAt(k));ch=true}}return ch}
  armedList(){const now=Date.now();return this.peers().map(w=>w.deserializeAttachment()).filter(x=>x&&(x.bat||0)>now).map(x=>({no:x.no,ms:x.bat-now,k:x.batK||'bat'}))}
