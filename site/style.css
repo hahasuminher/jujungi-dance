@@ -5,7 +5,7 @@
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--hand);font-size:18px;line-height:1.45;padding:0 max(16px,env(safe-area-inset-right,0px)) 32px max(16px,env(safe-area-inset-left,0px));overflow-x:hidden}
 .wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-#stage{position:relative;height:clamp(380px,62vh,680px);overflow:hidden;margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)))}
+#stage{position:relative;height:clamp(320px,50vh,600px);overflow:hidden;margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px)))}
 @media(min-width:893px){#stage{margin-inline:0}}
 #cv{position:absolute;inset:0;width:100%;height:100%;display:block}
 h1{position:absolute;left:16px;top:18px;margin:0;font-family:var(--title);font-weight:400;font-size:clamp(46px,10vw,76px);line-height:.95;transform:rotate(-4deg);transform-origin:left top;pointer-events:none;width:3.4em}
@@ -39,7 +39,7 @@ summary{font-family:var(--stamp);font-size:24px;cursor:pointer}
 .sliders input{accent-color:var(--neon-p);width:100%}
 footer{color:var(--soft);font-size:15px;margin-top:8px}footer a{color:inherit}
 @media(prefers-reduced-motion:reduce){h1,#go{transform:none}}
-#enter{min-height:78px;font-family:var(--stamp);font-size:34px;color:#fff;background:#2b6cff;border:3px solid var(--ink);border-radius:18px 225px 18px 255px/255px 18px 225px 18px;box-shadow:5px 6px 0 var(--ink);transform:rotate(.6deg)}
+#enter{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:76px;font-family:var(--stamp);font-size:28px;color:#fff;background:#2b6cff;border:3px solid var(--ink);border-radius:18px 225px 18px 255px/255px 18px 225px 18px;box-shadow:5px 6px 0 var(--ink);transform:rotate(.6deg)}
 #enter:active{transform:translate(4px,5px);box-shadow:1px 1px 0 var(--ink)}
 #enter[data-on="1"]{background:var(--ink);color:var(--neon-y)}
 .rule{margin:8px 0 0;font-weight:700;max-width:65ch}
@@ -97,6 +97,6 @@ body.typing #dock{padding-bottom:8px}
 #singMode{margin-top:2px;gap:6px}#singLyr{display:flex;flex-direction:column;gap:6px}#singLyr[hidden]{display:none}
 #friend{min-height:48px;font-weight:700;background:var(--paper);border:3px solid var(--ink);border-radius:18px 225px 18px 255px/255px 18px 225px 18px}
 #friendBox{display:flex;flex-direction:column;gap:8px}#friendBox[hidden]{display:none}#friendBox button{min-height:46px;font-weight:700;background:var(--neon-y);border:2px solid var(--ink);border-radius:10px;padding:0 16px}#friendBox .row{display:flex;gap:8px}#fCode{flex:1;min-width:0;padding:8px 10px;font:inherit;font-weight:700;text-transform:uppercase;border:3px solid var(--ink);border-radius:10px}
-#tag{margin:0;font-weight:700;font-size:18px;text-align:center}
+#enter small{font-family:var(--hand,inherit);font-size:15px;font-weight:700}
 #friend small{font-size:15px;font-weight:400;margin-left:6px}
 #soundTap{position:fixed;z-index:7;left:50%;top:calc(66px + env(safe-area-inset-top,0px));transform:translateX(-50%);padding:9px 18px;font-weight:700;color:#fff;background:var(--ink);border:0;border-radius:10px;white-space:nowrap}#soundTap[hidden]{display:none}
