@@ -10,6 +10,8 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div id="resumeMask" hidden>광장으로 돌아가는 중…</div>
+<script>try{const v=JSON.parse(localStorage.getItem('jd.spot')||'null');if(v&&v.r&&Date.now()-v.t<3600000){const m=document.getElementById('resumeMask');m.hidden=false;setTimeout(()=>m.remove(),12000)}}catch(e){}</script>
 <div class="wrap">
   <div id="stage">
     <canvas id="cv" aria-label="입력한 말에 맞춰 춤추는 무표정한 주둥이" role="img"></canvas>

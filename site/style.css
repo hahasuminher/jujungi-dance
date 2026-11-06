@@ -100,3 +100,4 @@ body.typing #dock{padding-bottom:8px}
 #enter small{font-family:var(--hand,inherit);font-size:15px;font-weight:700}
 #friend small{font-size:15px;font-weight:400;margin-left:6px}
 #soundTap{position:fixed;z-index:7;left:50%;top:calc(66px + env(safe-area-inset-top,0px));transform:translateX(-50%);padding:9px 18px;font-weight:700;color:#fff;background:var(--ink);border:0;border-radius:10px;white-space:nowrap}#soundTap[hidden]{display:none}
+#resumeMask{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;font-family:var(--stamp);font-size:26px;background:var(--paper)}#resumeMask[hidden]{display:none}
