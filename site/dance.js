@@ -1,5 +1,5 @@
 /* 2D 춤 엔진: 그린 포즈를 목표로 윤곽 점이 스프링처럼 따라가 중간 동작을 만든다 */
-const SPECIALS={퇴근:'run',월요일:'melt',사랑해:'love',치킨:'chicken',로또:'lotto',살려줘:'sink',야근:'zombie',주둥이:'bigmouth',윈드밀:'windmill',비보이:'combo',스텝:'sixstep',둠칫:'groove',출근:'commute',월급:'salary',다이어트:'diet',시험:'exam',망했다:'doom',대박:'jackpot',소주:'soju',커피:'coffee',야식:'snack',졸려:'sleepy',엄마:'mom',사장님:'boss',생일:'bday',바이:'bye',바이바이:'bye',빠이:'bye',잘자:'night','잘 자':'night',굿나잇:'night',굿밤:'night'};
+const SPECIALS={퇴근:'run',출근:'commute',치킨:'chicken',굿나잇:'night',잘자:'night','잘 자':'night',굿밤:'night',똥:'poop',방구:'fart',미안:'sorry',대박:'jackpot',헐:'huh',어머나:'shock',야르:'yar',바이:'bye',바이바이:'bye',빠이:'bye',사랑해:'love',주둥이:'bigmouth',졸려:'sleepy',생일:'bday',월급:'salary',축하:'congrats',월요일:'melt',금요일:'fri',배고파:'snack',배고프다:'snack',귀찮아:'lazy',귀찮다:'lazy',미쳤다:'combo',미쳤어:'combo',실화냐:'crash',소주:'soju'};
 const Dance=(()=>{
 const H_U=1790,D=POSES,M=D.M,SEG=D.seg,CXs=1181,CYs=1180,TAU=Math.PI*2,PIm=Math.PI,HH=494,BEAT=60/118;
 const land=[];{let c=0;for(let i=0;i<8;i++){land[i]=c;c+=SEG[i]}}
@@ -207,7 +207,16 @@ const FINALE={run:'sixstep',melt:'headspin',love:'lotto',chicken:'windmill',lott
  sB:()=>[[0,Z.H],[.5,m(Z.H)],[1,Z.H],[1.5,m(Z.H)],[2,Z.I],[3,m(Z.I)],[4,Z.J],[5,m(Z.J)],[6,Z.R],[7,m(Z.R)],[7.7,A]],
  sC:()=>[[0,Z.O],[2,m(Z.O)],[4,Z.K],[5,Z.M],[6,Z.G,{dy:-.2}],[7,Z.M,{dy:0}],[7.7,A]],
  sD:()=>[[0,Z.S],[1,Z.H],[2,Z.I],[3,Z.J],[4,m(Z.S)],[5,m(Z.H)],[6,m(Z.I)],[7,m(Z.J)],[7.7,A]],
- sE:()=>[[0,Z.Q],[1,Z.L],[2,Z.M,{dy:-.15}],[3,Z.L,{dy:0}],[4,Z.K],[5,Z.Q],[6,Z.G,{dy:-.18}],[7,Z.M,{dy:0}],[7.7,A]]});
+ sE:()=>[[0,Z.Q],[1,Z.L],[2,Z.M,{dy:-.15}],[3,Z.L,{dy:0}],[4,Z.K],[5,Z.Q],[6,Z.G,{dy:-.18}],[7,Z.M,{dy:0}],[7.7,A]],
+ poop:()=>[[0,Z.L],[1,rp({kl:1.9,kr:1.9,ry:.13,hs:.9,al:.4,ar:.4,bl:2,br:2})],[1.5,Z.L],[2.5,rp({kl:2,kr:2,ry:.14,hs:.85,al:.5,ar:.5,bl:2.2,br:2.2})],[3,Z.L],[4,rp({kl:1.9,kr:1.9,ry:.16,hs:1.25,al:1.4,ar:1.4})],[5,Z.K],[6,Z.G,{dy:-.12}],[7,Z.M,{dy:0}],[7.7,A]],
+ fart:()=>[[0,Z.I],[1,m(Z.I)],[2,Z.I],[3,Z.H],[4,Z.I,{dy:-.22}],[4.5,Z.I,{dy:0}],[5,Z.Q],[6,Z.I,{dy:-.22}],[6.5,Z.I,{dy:0}],[7,Z.S],[7.7,A]],
+ sorry:()=>[[0,Z.K],[1,Z.L],[2,Z.K],[3,Z.L],[4,Z.O],[6,m(Z.O)],[7.7,A]],
+ huh:()=>[[0,Z.G,{dy:-.18}],[.5,Z.G,{dy:0}],[1,rp({hs:1.35,al:2.7,ar:2.7,bl:.2,br:.2})],[2,Z.Q],[3,Z.G,{dy:-.18}],[4,Z.H,{dy:0}],[5,m(Z.H)],[6,Z.G,{dy:-.22}],[7,Z.M,{dy:0}],[7.7,A]],
+ shock:()=>[[0,Z.Q],[.5,Z.G,{dy:-.22}],[1,Z.G,{dy:0}],[2,Z.R],[3,m(Z.R)],[4,Z.O],[5,Z.J],[6,m(Z.J)],[7,Z.G],[7.7,A]],
+ yar:()=>[[0,Z.J],[1,Z.H,{dy:-.2}],[2,m(Z.J),{dy:0}],[3,m(Z.H),{dy:-.2}],[4,Z.S,{dy:0}],[5,Z.I],[6,m(Z.S)],[7,m(Z.I)],[7.7,A]],
+ fri:()=>[[0,Z.S],[.5,m(Z.S)],[1,Z.H],[1.5,m(Z.H)],[2,Z.I],[3,m(Z.I)],[4,Z.G,{dy:-.2}],[4.5,Z.M,{dy:0}],[5,Z.Q],[6,Z.G,{dy:-.2}],[6.5,Z.M,{dy:0}],[7,Z.S],[7.7,A]],
+ lazy:()=>[[0,Z.O],[3,m(Z.O)],[5,Z.K],[6,Z.O],[7.7,A]],
+ congrats:()=>[[0,Z.G,{dy:-.2}],[.5,Z.M,{dy:0}],[1,Z.G,{dy:-.2}],[1.5,Z.M,{dy:0}],[2,Z.Q],[3,Z.H],[4,m(Z.H)],[5,Z.I],[6,m(Z.I)],[7,Z.G,{dy:-.2}],[7.7,A,{dy:0}]]});
  {const R5=['sA','sB','sC','sD','sE'];Object.keys(BIG).filter(k=>!/^(c[A-Z]|s[A-E]$)/.test(k)).forEach((k,i)=>{FINALE[k]=R5[i%5]});Object.assign(FINALE,{sA:'sB',sB:'sD',sC:'sE',sD:'sA',sE:'sC'})}
  Object.assign(FINALE,{cHip1:'cHip2',cHip2:'cHip3',cHip3:'cHip1',cDis1:'cDis2',cDis2:'cDis1',cTro1:'cTro2',cTro2:'cTro1',cEdm1:'cEdm2',cEdm2:'cEdm1'})}
 return{setLow(v){lowP=v},setImages(i){Object.assign(IMG,i)},reseed,

@@ -66,7 +66,7 @@ function buildSpeech(raw,v,opt={}){
   let finalOut=out,mapT=s=>w.toOut(s);if(seg.til){const r=wobbleTail(out,Math.min(seg.til,6));finalOut=r.pcm;mapT=s=>r.map(w.toOut(s))}
   const off=text?[...text].length+1:0;events.push(...jamoEvents(spoken,p.ev,mapT,t,off,wordBase,p.len).map(e=>({...e,ex,q:Math.min(seg.q,5),til:Math.min(seg.til,6),dots:seg.dots})));
   wordBase+=spoken.split(' ').length;text+=(text?' ':'')+spoken;
-  {let best=null;for(const[word,name]of Object.entries(SPECIALS)){const re=word==='바이'||word==='빠이'?new RegExp('(^|[\\s,.!?~])'+word+'($|[\\s,.!?~])'):null,hit=re?re.exec(seg.raw):null,i=re?(hit?hit.index:-1):seg.raw.indexOf(word);if(i>=0&&(!best||i<best.i))best={i,word,name}}if(best)specials.push({ms:t,word:best.word,name:best.name})}
+  {let best=null;for(const[word,name]of Object.entries(SPECIALS)){const re=/^(바이|빠이|헐|똥)$/.test(word)?new RegExp('(^|[\\s,.!?~ㅋㅎ])'+word+'($|[\\s,.!?~ㅋㅎ])'):word==='방구'?/방구(?!석)/:null,hit=re?re.exec(seg.raw):null,i=re?(hit?hit.index:-1):seg.raw.indexOf(word);if(i>=0&&(!best||i<best.i))best={i,word,name}}if(best)specials.push({ms:t,word:best.word,name:best.name})}
   parts.push(finalOut);t+=finalOut.length/SR*1000;const gap=seg.dots?.28:.09;parts.push(new Float32Array(Math.round(gap*SR)));t+=gap*1000}
  const n=parts.reduce((a,p)=>a+p.length,0),pcm=new Float32Array(n);let o=0;for(const p of parts){pcm.set(p,o);o+=p.length}
  {let prev=0,pk=0;for(let i=0;i<n;i++){const x=pcm[i];pcm[i]=x-.62*prev;prev=x;pk=Math.max(pk,Math.abs(pcm[i]))}const k=.92/(pk||1);for(let i=0;i<n;i++)pcm[i]*=k}// 자음이 또렷하게 들리도록 고음을 살린다
