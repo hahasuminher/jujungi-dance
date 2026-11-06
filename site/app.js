@@ -1,9 +1,8 @@
 /* 화면 연결 */
 const $=id=>document.getElementById(id),store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const calm=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let voice=(()=>{const v={...VOICE_DEFAULT,...store.get('jd.voice',{})},p=VOICE_PRESETS.find(x=>x.id===v.id);return p?{...p}:String(v.id).startsWith('c')?v:{...VOICE_DEFAULT}})(),seed=(Math.random()*2**31)|0,found=new Set(store.get('jd.found',[]));
-const DEX=['퇴근','출근','치킨','굿나잇','똥','방구','미안','대박','헐','어머나','야르','바이','사랑해','주둥이','졸려','생일','월급','축하','월요일','금요일','배고파','귀찮아','미쳤다','실화냐','소주'],ALIAS={잘자:'굿나잇','잘 자':'굿나잇',굿밤:'굿나잇',바이바이:'바이',빠이:'바이',배고프다:'배고파',귀찮다:'귀찮아',미쳤어:'미쳤다'},SP_SFX={fart:'뿡!',poop:'뿌직!'};
-for(const w of[...found])if(!DEX.includes(w)){found.delete(w);if(ALIAS[w])found.add(ALIAS[w])}
+let voice=(()=>{const v={...VOICE_DEFAULT,...store.get('jd.voice',{})},p=VOICE_PRESETS.find(x=>x.id===v.id);return p?{...p}:String(v.id).startsWith('c')?v:{...VOICE_DEFAULT}})(),seed=(Math.random()*2**31)|0;
+const SP_SFX={fart:'뿡!',poop:'뿌직!'};
 const cv=$('cv'),g=cv.getContext('2d');let W=0,Ht=0,dpr=1;
 let dprLock=0,lowPower=false;function size(){const r=cv.getBoundingClientRect();W=r.width;Ht=r.height;dpr=dprLock||Math.min(2,devicePixelRatio||1,Math.sqrt(3e6/Math.max(1,W*Ht)));cv.width=W*dpr;cv.height=Ht*dpr}
 new ResizeObserver(size).observe(cv);size();
@@ -14,7 +13,7 @@ function render(now){g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle='#fff';g.fillRe
  if(burst>.05){const R0=Math.max(W,Ht)*.42*burst,n=13,rot=calm?0:Math.floor(now/110)*.13,P=[];for(let i=0;i<n*2;i++){const a=rot+i*Math.PI/n,r=R0*(i%2?.62:1);P.push([ox+Math.cos(a)*r,oy+Math.sin(a)*r])}Rough.poly(g,P,{fill:burstHue?'#ff2bb3':'#f4ff1f',stroke:null,amp:2.6})}
  const bt=Dance.isBig()?Dance.bigBeat():0;const sh=!calm&&FX.shake();if(sh)g.translate(Math.sin(now/27)*7,Math.cos(now/21)*6);FX.back(g,bt);if(Plaza.isOn()){const e=Plaza.draw(g,W,Ht,now,tick,calm,burstHue,bt,Dance.isBig());FX.front(g,bt,e?Dance.eyes(W,Ht,e[0],e[1],e[2]):null,calm);return}Dance.render(g,W,Ht,S,ox,oy,tick,calm,burstHue);FX.front(g,bt,Dance.eyes(W,Ht,S,ox,oy),calm)}
 let ema=16,lowCount=0;function loop(now){const rawDt=now-last,dt=Math.min(.033,rawDt/1000);last=now;ema+=(rawDt-ema)*.05;if(ema>26)lowCount++;else lowCount=Math.max(0,lowCount-1);if(lowCount>90&&!lowPower){lowPower=true;Dance.setLow(true);dprLock=dprLock||1;size()}
- if(play){const ms=play.clock();while(evI<events.length&&events[evI].ms<=ms)fire(events[evI++]);while(spI<specials.length&&specials[spI].ms<=ms){const sp=specials[spI++];if(Dance.big(sp.name))FX.start(sp.name,sp.word,W,Ht);if(SP_SFX[sp.name])Sfx.play(SP_SFX[sp.name],volume);const cell=ALIAS[sp.word]||sp.word;if(!found.has(cell)){found.add(cell);store.set('jd.found',[...found]);showFound();if(Plaza.isOn())Plaza.note(`새 단어 발견: ${cell}!`);else $('msg').textContent=`새 단어 발견: ${cell}!`}}if(ms>=play.total)finish()}
+ if(play){const ms=play.clock();while(evI<events.length&&events[evI].ms<=ms)fire(events[evI++]);while(spI<specials.length&&specials[spI].ms<=ms){const sp=specials[spI++];if(Dance.big(sp.name))FX.start(sp.name,sp.word,W,Ht);if(SP_SFX[sp.name])Sfx.play(SP_SFX[sp.name],volume)}if(ms>=play.total)finish()}
  Dance.update(dt,now);if(Plaza.isOn())Plaza.update(dt);if(clubLoop&&!Dance.isBig()){const L=CLUB_DANCE[clubTheme]||CLUB_DANCE.edm;Dance.big(L[Math.floor(Math.random()*L.length)])}if(FX.isOn()&&!Dance.isBig())FX.stop();FX.update(dt,W,Ht);if(Dance.isBig()&&Math.floor(Dance.bigBeat()/2)!==lastHalf){lastHalf=Math.floor(Dance.bigBeat()/2);burstHue=1-burstHue}burst+=(((play||Dance.isBig())?1:0)-burst)*.14;
  tick=Math.floor(now/110);render(now);if(rec&&rec.mr)drawFrame();requestAnimationFrame(loop)}
 function fire(e){const j=$('jamo');j.textContent=e.j;if(!calm)j.style.transform=`rotate(${(Math.random()*26-13).toFixed(1)}deg) scale(${(.9+Math.random()*.25+e.ex*.05).toFixed(2)})`;Dance.event(e);
@@ -70,11 +69,9 @@ async function saveRec(){const r=rec,ext=r.type.includes('mp4')?'mp4':'webm',blo
  const u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download=name;document.body.append(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),6e4);$('msg').textContent=`${ext.toUpperCase()} 영상을 내려받았어요.`}
 $('record').onclick=()=>{if(rec)return;if(play){finish();Dance.stop();FX.stop()}if(!startRec())return;speak(true)};
 function fromLink(){const m=location.hash.match(/^#d=(.+)/);if(!m)return;try{const d=dec(m[1]);if(typeof d.t==='string')$('say').value=d.t.slice(0,300);if(d.v&&typeof d.v==='object')for(const[k]of SL)if(typeof d.v[k]==='number')voice[k]=clampN(d.v[k],SL.find(x=>x[0]===k)[2],SL.find(x=>x[0]===k)[3]);voice.id='shared';voice.name='친구 목소리';if(Number.isFinite(d.s))seed=d.s|0;$('msg').textContent='친구의 춤이 도착했어요. 주둥이 털기를 누르세요.'}catch(e){$('msg').textContent='공유 링크를 읽지 못했어요.'}}
-function showFound(){$('found').textContent=`숨은 단어 도감 ${found.size}/${DEX.length}`;$('dexCount').textContent=`${DEX.length}개 중 ${found.size}개 발견`;$('dexGrid').replaceChildren(...DEX.map(w=>{const c=document.createElement('span'),on=found.has(w);c.className=on?'dex on':'dex';c.textContent=on?w:w.length>1?w[0]+'○'.repeat(w.length-1):'?';return c}))}
-$('found').onclick=()=>{$('dexOpen').hidden=false};$('dexClose').onclick=()=>{$('dexOpen').hidden=true};
 $('f').addEventListener('submit',e=>{e.preventDefault();speak()});
 $('say').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('f').requestSubmit()}});
-$('say').addEventListener('focus',e=>{if(e.target.value===e.target.defaultValue)e.target.select()});fromLink();Dance.reseed(seed);drawVoice();Plaza.init(cv);showFound();
+$('say').addEventListener('focus',e=>{if(e.target.value===e.target.defaultValue)e.target.select()});fromLink();Dance.reseed(seed);drawVoice();Plaza.init(cv);
 (async()=>{await Promise.all([...'ABCDEFGHIJKLMOQRS'].map(k=>new Promise(r=>{const i=new Image();i.onload=()=>{IMG[k]=i;r()};i.onerror=r;i.src=`assets/${k}.png`})));
  try{await bootVoice();startSynth()}catch(e){console.warn(e);$('msg').textContent='웃긴 목소리를 불러오지 못해서 기기 기본 목소리로 말합니다.';$('msg').className='err'}
  $('go').disabled=false;$('go').textContent='주둥이 털기'})();
