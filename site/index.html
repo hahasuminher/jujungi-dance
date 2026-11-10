@@ -33,8 +33,6 @@
     </div>
     <div id="msg" role="status"></div>
   </form>
-  <details id="rules"><summary>광장 규칙</summary>
-    <p class="rule">광장에서는 다른 사람의 외침이 그대로 들립니다. 욕은 기본으로 삐 처리되고, 성적인 말, 혐오 표현, 개인정보, 링크는 전송되지 않습니다. 금칙어 검사가 모든 공격을 막지는 못하니 불쾌한 외침은 음소거나 신고를 눌러 주세요. 규칙을 읽었다면 광장 입장을 한 번 더 누르세요.</p></details>
   <details><summary>목소리 만들기</summary>
     <div id="presets" class="chips"></div>
     <div id="sliders" class="sliders"></div>
@@ -57,6 +55,17 @@
    <div class="acts"><button id="aSit" type="button" aria-pressed="false">앉기</button><button id="aLie" type="button" aria-pressed="false">눕기</button><button id="aRide" type="button" aria-pressed="false">업히기</button><button id="aTrain" type="button" aria-pressed="false">기차</button><button id="aBanana" type="button">바나나</button><button id="aClub" type="button">클럽</button></div>
    <form id="pForm"><input id="pIn" maxlength="120" enterkeyhint="send" placeholder="광장에 외칠 말" autocomplete="off" aria-label="광장에 외칠 말"><button type="submit">외치기</button></form></div>
 </div>
+<div id="rulePop" role="dialog" aria-modal="true" aria-labelledby="ruleT" hidden><div class="rp-box">
+  <strong id="ruleT">광장 이용 수칙</strong>
+  <ul>
+   <li>다른 사람의 외침이 그대로 들려요.</li>
+   <li>욕을 삐 처리하려면 광장 오른쪽 위 <b>설정</b>에서 켜 주세요.</li>
+   <li>성적인 말, 혐오 표현, 개인정보, 링크는 보내지지 않아요.</li>
+   <li>금칙어 검사가 모두 막지는 못해요. 불쾌한 외침은 <b>음소거</b>나 <b>신고</b>를 눌러 주세요.</li>
+  </ul>
+  <button id="rpGo" type="button">광장 입장</button>
+  <button id="rpNo" type="button">닫기</button>
+</div></div>
 <script src="boot.js"></script>
 </body>
 </html>
